@@ -1,6 +1,7 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent, ReactNode } from 'react';
 import './App.css';
 import axios from 'axios';
+import BibTeXModal from './BibTeXModal/BibTeXModal';
 
 interface Paper {
   id: string;
@@ -375,6 +376,7 @@ const SavedPaperCard: React.FC<SavedPaperCardProps> = ({ paper, filterQuery, onD
         )}
       </div>
       <div className="paper-actions">
+        <BibTeXModal paperId={paper.id} />
         <button
           onClick={onDelete}
           disabled={isDeleting}

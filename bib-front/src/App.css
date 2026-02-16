@@ -83,7 +83,7 @@ body {
 
 .search-button {
   padding: 12px 24px;
-  background-color: #3498db;
+  background-color: #3B82F6;
   color: white;
   border: none;
   border-radius: 4px;
@@ -93,7 +93,7 @@ body {
 }
 
 .search-button:hover:not(:disabled) {
-  background-color: #2980b9;
+  background-color: #1E40AF;
 }
 
 .search-button:disabled {
@@ -161,6 +161,8 @@ body {
 
 .paper-actions {
   display: flex;
+  flex-direction: row;
+  gap: 10px;
   justify-content: flex-end;
   margin-top: 15px;
 }

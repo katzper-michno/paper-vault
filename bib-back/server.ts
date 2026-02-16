@@ -50,6 +50,53 @@ const savePapersToDatabase = (papers: Paper[]) => {
   })
 }
 
+// Function to escape BibTeX special characters
+const escapeBibTeX = (str: string): string => {
+  return str
+    .replace(/\\/g, '\\textbackslash{}')
+    .replace(/&/g, '\\&')
+    .replace(/%/g, '\\%')
+    .replace(/\$/g, '\\$')
+    .replace(/#/g, '\\#')
+    .replace(/_/g, '\\_')
+    .replace(/{/g, '\\{')
+    .replace(/}/g, '\\}')
+    .replace(/\^/g, '\\^{}')
+    .replace(/~/g, '\\~{}');
+}
+
+// Function to generate BibTeX entry
+const generateBibTeX = (paper: Paper): string => {
+  const {
+    title,
+    authors,
+    abstract,
+    year,
+    venue,
+    doi,
+    url
+  } = paper;
+
+  // Format authors: "Last, First and Last, First"
+  const formattedAuthors = authors.join(' and ');
+
+  // Generate a citation key: first author's last name + year
+  const citationKey = `${authors[0].split(' ').slice(-1)[0].toLowerCase()}${year}`;
+
+  // Construct BibTeX string
+  const bibtex = `@article{${citationKey},
+  author = {${escapeBibTeX(formattedAuthors)}},
+  title  = {${escapeBibTeX(title)}},
+  journal = {${escapeBibTeX(venue)}},
+  year   = {${year}},
+  doi    = {${escapeBibTeX(doi)}},
+  url    = {${escapeBibTeX(url)}},
+  abstract = {${escapeBibTeX(abstract)}}
+}`;
+
+  return bibtex;
+}
+
 app.get('/api/search', (req: Request<{}, {}, {}, SearchQuery>, res: Response) => {
   const { q } = req.query;
 
@@ -170,7 +217,7 @@ app.delete('/api/papers/:id', (req: Request<{ id: string }>, res: Response) => {
   getPapersFromDatabase().then((savedPapers: Paper[]) => {
     setTimeout(() => {
       if (!savedPapers.some((p: Paper) => p.id === id)) {
-        return res.status(404).json({ message: 'Paper not found in database' });
+        return res.status(404).json({ message: `No paper found with id ${id}` });
       }
 
       savePapersToDatabase(savedPapers.filter((p: Paper) => p.id !== id));
@@ -203,6 +250,23 @@ app.delete('/api/papers/:id', (req: Request<{ id: string }>, res: Response) => {
 //   }, 200);
 // });
 
+// Generate BibTeX for specified paper
+app.get('/api/papers/:id/bibtex', (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+
+  getPapersFromDatabase().then((savedPapers: Paper[]) => {
+    const matchingPapers = savedPapers.filter((p: Paper) => p.id === id);
+
+    if (matchingPapers.length === 0) {
+      return res.status(404).json({ message: `No paper found with id ${id}` });
+    } else {
+      const thePaper = matchingPapers[0];
+
+      res.json({ bibtex: generateBibTeX(thePaper) })
+    }
+  })
+});
+
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
@@ -220,4 +284,5 @@ app.listen(process.env.PORT, () => {
   console.log(`   POST /api/papers`);
   // console.log(`   GET  /api/papers/:id`);
   console.log(`   DELETE /api/papers/:id`);
+  console.log(`   GET /api/paper/:id/bibtex`)
 });
