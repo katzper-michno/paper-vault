@@ -1,0 +1,41 @@
+{
+  "papers": [
+    {
+      "id": "64d9f640ed4a5741796873b78991b8a1b498e0fa",
+      "title": "On Boolean PCSPs with Polynomial Threshold Polymorphisms",
+      "authors": [
+        "Katzper Michno"
+      ],
+      "abstract": "In pursuit of a deeper understanding of Boolean Promise Constraint Satisfaction Problems (PCSPs), we identify a class of problems with restricted structural complexity, which could serve as a promising candidate for complete characterization. Specifically, we investigate the class of PCSPs whose polymorphisms are Polynomial Threshold Functions (PTFs) of bounded degree. We obtain two complexity characterization results: (1) with a hardness condition introduced in [ACMTCT'21], we establish a complete complexity dichotomy in the case where coefficients of PTF representations are non-negative; (2) dropping the non-negativity assumption, we show a hardness result for PTFs admitting coordinates with significant influence, conditioned on the Rich 2-to-1 Conjecture proposed in [ITCS'21]. In order to prove the latter, we show that a random 2-to-1 minor map retains significant coordinate influence over the $p$-biased hypercube with constant probability.",
+      "year": 2025,
+      "venue": "arXiv.org",
+      "doi": "10.48550/arXiv.2509.26248",
+      "url": "https://www.semanticscholar.org/paper/64d9f640ed4a5741796873b78991b8a1b498e0fa"
+    },
+    {
+      "id": "MOCK_ID",
+      "title": "Factoring through monomial representations: arithmetic characterizations and ambiguity of weighted automata",
+      "authors": [
+        "Antoni Puch",
+        "Daniel Smertnig"
+      ],
+      "abstract": "We characterize group representations that factor through monomial representations, respectively, block-triangular representations with monomial diagonal blocks, by arithmetic properties. Similar results are obtained for semigroup representations by invertible transformations. The characterizations use results on unit equations from Diophantine number theory (by Evertse, van der Poorten, and Schlickewei in characteristic zero, and by Derksen and Masser in positive characteristic).\n\nSpecialized to finitely generated groups in characteristic zero, one of our main theorems recovers an improvement of a very recent similar characterization by Corvaja, Demeio, Rapinchuk, Ren, and Zannier that was motivated by the study of the bounded generation (BG) property. In positive characteristic, we get a characterization of linear BG groups, recovering a theorem of Abért, Lubotzky, and Pyber from 2003.\n\nOur motivation comes from weighted finite automata (WFA) over a field. For invertible WFA we show that M-ambiguity, finite ambiguity, and polynomial ambiguity are characterized by arithmetic properties. We discover a full correspondence between arithmetic properties and a complexity hierarchy for WFA based on ambiguity. In the invertible case, this is a far-reaching generalization of a recent result by Bell and the second author, characterizing unambiguous WFA, that resolved a 1979 conjecture of Reutenauer. As a consequence, using the computability of the (linear) Zariski closure of a finitely generated matrix semigroup, the M-ambiguity, finite ambiguity, and polynomial ambiguity properties are algorithmically decidable for invertible WFA.",
+      "year": 2024,
+      "venue": "arXiv",
+      "doi": "https://doi.org/10.48550/arXiv.2410.03444",
+      "url": "https://arxiv.org/abs/2410.03444"
+    },
+    {
+      "id": "MOCK_ID_2",
+      "title": "Transducers of polynomial growth",
+      "authors": [
+        "Mikołaj Bojańczyk"
+      ],
+      "abstract": "The polyregular functions are a class of string-to-string functions that have polynomial size outputs, and which can be defined using finite state models. There are many equivalent definitions of this class, with roots in automata theory, programming languages and logic. This paper surveys recent results on polyregular functions. It presents five of the equivalent definitions, and gives self-contained proofs for most of the equivalences. Decision problems as well as restricted subclasses of the polyregular functions are also discussed.",
+      "year": 2022,
+      "venue": "Proceedings of the 37th Annual ACM/IEEE Symposium on Logic in Computer Science",
+      "doi": "10.1145/3531130.3533326",
+      "url": "https://doi.org/10.1145/3531130.3533326"
+    }
+  ]
+}
