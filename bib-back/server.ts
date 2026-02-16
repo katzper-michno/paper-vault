@@ -28,10 +28,6 @@ interface SearchQuery {
   q?: string;
 }
 
-export interface SearchResponse {
-  papers: Paper[];
-}
-
 const db_path = (): string => {
   const p = process.env.DB_PATH;
   if (!p) {
@@ -42,12 +38,11 @@ const db_path = (): string => {
 
 const getPapersFromDatabase = async (): Promise<Paper[]> => {
   const file = await readFile(db_path(), "utf-8");
-  const data = JSON.parse(file) as SearchResponse;
-  return data.papers;
+  return JSON.parse(file) as Paper[];
 }
 
 const savePapersToDatabase = (papers: Paper[]) => {
-  writeFile(db_path(), JSON.stringify({ papers: papers }, null, 2), (err: any) => {
+  writeFile(db_path(), JSON.stringify(papers, null, 2), (err: any) => {
     if (err) {
       console.error('Error writing file', err);
       throw err;
@@ -98,8 +93,7 @@ app.get('/api/search', (req: Request<{}, {}, {}, SearchQuery>, res: Response) =>
           }
 
           if (!searchResponse.data.data || searchResponse.data.data.length === 0) {
-            const response: SearchResponse = { papers: [] }
-            return res.json(response);
+            return res.json([]);
           }
 
           let responsePapers = searchResponse.data.data;
@@ -112,20 +106,19 @@ app.get('/api/search', (req: Request<{}, {}, {}, SearchQuery>, res: Response) =>
           }));
 
           // TODO: Some type for the Semantic Scholar response
-          res.json({
-            papers:
-              papersWithSavedStatus.map((paper: any) => ({
-                id: paper.paperId,
-                title: paper.title,
-                authors: paper.authors.map((auth: any) => auth.name),
-                abstract: paper.abstract || 'N/A',
-                year: paper.year || 'N/A',
-                venue: paper.venue || 'N/A',
-                doi: paper.externalIds?.DOI || 'N/A',
-                url: paper.url || 'N/A',
-                saved: paper.saved
-              }))
-          })
+          res.json(
+            papersWithSavedStatus.map((paper: any) => ({
+              id: paper.paperId,
+              title: paper.title,
+              authors: paper.authors.map((auth: any) => auth.name),
+              abstract: paper.abstract || 'N/A',
+              year: paper.year || 'N/A',
+              venue: paper.venue || 'N/A',
+              doi: paper.externalIds?.DOI || 'N/A',
+              url: paper.url || 'N/A',
+              saved: paper.saved
+            }))
+          )
         })
       })
     } catch (error) {
@@ -135,11 +128,12 @@ app.get('/api/search', (req: Request<{}, {}, {}, SearchQuery>, res: Response) =>
   }, 500);
 });
 
-app.get('/api/saved-papers', (_req: Request, res: Response) => {
+// Get a list of all saved papers
+app.get('/api/papers', (_req: Request, res: Response) => {
   setTimeout(() => {
     try {
       getPapersFromDatabase().then((savedPapers: Paper[]) => {
-        res.json({ papers: savedPapers });
+        res.json(savedPapers);
       })
     } catch (error) {
       console.log('Error when obtaining saved papers:', error);
@@ -148,7 +142,8 @@ app.get('/api/saved-papers', (_req: Request, res: Response) => {
   }, 300);
 });
 
-app.post('/api/save-paper', (req: Request, res: Response) => {
+// Save a new paper
+app.post('/api/papers', (req: Request, res: Response) => {
   const paper = req.body as Paper;
   delete paper.saved;
 
@@ -163,26 +158,27 @@ app.post('/api/save-paper', (req: Request, res: Response) => {
       }
 
       savePapersToDatabase([paper, ...savedPapers]);
-      res.status(201).json({ papers: [{ ...paper, saved: true }, ...savedPapers] })
+      res.status(201).json({ ...paper, saved: true })
     }, 400);
   })
 });
 
 // Delete a saved paper
-// app.delete('/api/saved-papers/:id', (req: Request<{ id: string }>, res: Response) => {
-//   const { id } = req.params;
-//
-//   setTimeout(() => {
-//     const initialLength = savedPapers.length;
-//     savedPapers = savedPapers.filter(paper => paper.id !== id);
-//
-//     if (savedPapers.length === initialLength) {
-//       return res.status(404).json({ error: 'Paper not found' });
-//     }
-//
-//     res.json({ message: 'Paper removed successfully' });
-//   }, 300);
-// });
+app.delete('/api/papers/:id', (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+
+  getPapersFromDatabase().then((savedPapers: Paper[]) => {
+    setTimeout(() => {
+      if (!savedPapers.some((p: Paper) => p.id === id)) {
+        return res.status(404).json({ message: 'Paper not found in database' });
+      }
+
+      savePapersToDatabase(savedPapers.filter((p: Paper) => p.id !== id));
+
+      res.json({ message: 'Paper removed successfully' });
+    }, 300);
+  })
+});
 
 // Get a specific paper
 // app.get('/api/papers/:id', (req: Request<{ id: string }>, res: Response) => {
@@ -220,8 +216,8 @@ app.listen(process.env.PORT, () => {
   console.log(`Bibliography server running on http://localhost:${process.env.PORT}`);
   console.log(`Available endpoints:`);
   console.log(`   GET  /api/search?q=:query`);
-  console.log(`   GET  /api/saved-papers`);
-  console.log(`   POST /api/save-paper`);
-  console.log(`   GET  /api/papers/:id`);
-  console.log(`   DELETE /api/saved-papers/:id`);
+  console.log(`   GET  /api/papers`);
+  console.log(`   POST /api/papers`);
+  // console.log(`   GET  /api/papers/:id`);
+  console.log(`   DELETE /api/papers/:id`);
 });

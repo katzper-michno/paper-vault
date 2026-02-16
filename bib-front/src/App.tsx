@@ -14,13 +14,10 @@ interface Paper {
   saved: boolean;
 }
 
-interface SearchResponse {
-  papers: Paper[];
-}
-
 interface LoadingState {
   search: boolean;
   save: string | null;
+  delete: string | null;
   load: boolean;
 }
 
@@ -34,6 +31,7 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState<LoadingState>({
     search: false,
     save: null,
+    delete: null,
     load: false
   });
 
@@ -46,8 +44,8 @@ const App: React.FC = () => {
   const fetchSavedPapers = async (): Promise<void> => {
     setLoading(prev => ({ ...prev, load: true }));
     try {
-      const res = await axios.get<SearchResponse>(`${SERVER_HOST}/saved-papers`);
-      setSavedPapers(res.data.papers);
+      const res = await axios.get<Paper[]>(`${SERVER_HOST}/papers`);
+      setSavedPapers(res.data);
     } catch (err: any) {
       console.error(err);
       setSavedPapers(err.response.data.message);
@@ -62,8 +60,8 @@ const App: React.FC = () => {
 
     setLoading(prev => ({ ...prev, search: true }));
     try {
-      const res = await axios.get<SearchResponse>(`${SERVER_HOST}/search?q=${encodeURIComponent(searchQuery)}`);
-      setSearchResults(res.data.papers);
+      const res = await axios.get<Paper[]>(`${SERVER_HOST}/search?q=${encodeURIComponent(searchQuery)}`);
+      setSearchResults(res.data);
     } catch (err: any) {
       console.error(err);
       setSearchResults(err.response.data.message);
@@ -76,9 +74,9 @@ const App: React.FC = () => {
     setLoading(prev => ({ ...prev, save: paper.id }));
 
     try {
-      const res = await axios.post<SearchResponse>(`${SERVER_HOST}/save-paper`, paper);
+      const res = await axios.post<Paper>(`${SERVER_HOST}/papers`, paper);
 
-      setSavedPapers(res.data.papers);
+      setSavedPapers(prev => (Array.isArray(prev) ? [res.data, ...prev] : [res.data]))
 
       setSearchResults(prev =>
         (Array.isArray(prev)) ? (
@@ -88,8 +86,31 @@ const App: React.FC = () => {
       );
     } catch (err: any) {
       console.error('Error saving paper:', err);
+      setSavedPapers(`Error saving paper: ${err}`);
     } finally {
       setLoading(prev => ({ ...prev, save: null }));
+    }
+  };
+
+  const handleDeletePaper = async (paper: Paper): Promise<void> => {
+    setLoading(prev => ({ ...prev, delete: paper.id }));
+
+    try {
+      await axios.delete(`${SERVER_HOST}/papers/${paper.id}`);
+
+      setSavedPapers(prev => (Array.isArray(prev) ? prev.filter((p: Paper) => p.id !== paper.id) : prev));
+
+      setSearchResults(prev =>
+        (Array.isArray(prev)) ? (
+          prev.map(p =>
+            p.id === paper.id ? { ...p, saved: false } : p
+          )) : prev
+      );
+    } catch (err: any) {
+      console.error('Error deleting paper:', err);
+      setSavedPapers(`Error deleting paper: ${err}`)
+    } finally {
+      setLoading(prev => ({ ...prev, delete: null }));
     }
   };
 
@@ -137,7 +158,13 @@ const App: React.FC = () => {
           <div className="saved-list">
             {
               filteredSavedPapers.map(paper => (
-                <SavedPaperCard key={paper.id} paper={paper} filterQuery={filterQuery} />
+                <SavedPaperCard
+                  key={paper.id}
+                  paper={paper}
+                  filterQuery={filterQuery}
+                  onDelete={() => handleDeletePaper(paper)}
+                  isDeleting={loading.delete === paper.id}
+                />
               ))
             }
           </div>
@@ -299,9 +326,11 @@ const HighlightedText: React.FC<{ text: string, query: string }> = ({ text, quer
 interface SavedPaperCardProps {
   paper: Paper;
   filterQuery: string;
+  onDelete: () => void;
+  isDeleting: boolean;
 }
 
-const SavedPaperCard: React.FC<SavedPaperCardProps> = ({ paper, filterQuery }) => {
+const SavedPaperCard: React.FC<SavedPaperCardProps> = ({ paper, filterQuery, onDelete, isDeleting }) => {
   const renderAuthors = (): string => {
     if (paper.authors.length === 0) return 'Unknown authors';
     else return paper.authors.join(', ');
@@ -344,6 +373,15 @@ const SavedPaperCard: React.FC<SavedPaperCardProps> = ({ paper, filterQuery }) =
             <strong>URL:</strong> <a href={paper.url} target="_blank" rel="noopener noreferrer">{paper.url}</a>
           </p>
         )}
+      </div>
+      <div className="paper-actions">
+        <button
+          onClick={onDelete}
+          disabled={isDeleting}
+          className={'delete-button'}
+        >
+          {isDeleting ? 'Deleting...' : 'Delete'}
+        </button>
       </div>
     </article>
   );
