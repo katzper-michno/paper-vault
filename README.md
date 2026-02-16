@@ -37,3 +37,10 @@ chmod +x run.sh
 ```
 
 4. Open and have fun! <http://localhost:3000>
+
+## TODO
+
+- [ ] Better BibTeX generation (more fields, more accurate)
+- [ ] Possibility to manually edit saved papers
+- [ ] Adding PDFs to saved papers
+- [ ] SciHub search (?)
