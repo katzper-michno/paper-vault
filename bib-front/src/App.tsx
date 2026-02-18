@@ -178,10 +178,6 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>Bibliography</h1>
-      </header>
-
       <div className="main-container">
         {/* Search Section */}
         <section className="search-section">
