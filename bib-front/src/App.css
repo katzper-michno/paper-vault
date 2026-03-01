@@ -16,42 +16,14 @@ body {
 }
 
 .main-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 30px;
-  max-width: 1600px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-@media (max-width: 768px) {
-  .main-container {
-    grid-template-columns: 1fr;
-  }
-}
-
-.paper-title {
-  margin-bottom: 10px;
-  color: #2c3e50;
-  font-size: 1.1rem;
-}
-
-.paper-authors,
-.paper-year,
-.paper-venue,
-.paper-doi,
-.paper-url,
-.saved-date {
-  margin-bottom: 8px;
-  color: #666;
-  font-size: 0.95rem;
-}
-
-.paper-abstract {
-  margin-bottom: 12px;
-  color: #555;
-  line-height: 1.5;
-  font-size: 0.95rem;
-}
+@media (max-width: 768px) {}
 
 .paper-actions {
   display: flex;

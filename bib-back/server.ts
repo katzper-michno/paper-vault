@@ -19,8 +19,11 @@ interface Paper {
   abstract: string;
   year: number;
   venue: string;
-  doi: string;
-  url: string;
+  doi?: string;
+  urls: {
+    semanticScholar?: string;
+    arxiv?: string;
+  }
   saved?: boolean;
 }
 
@@ -73,8 +76,6 @@ const generateBibTeX = (paper: Paper): string => {
     abstract,
     year,
     venue,
-    doi,
-    url
   } = paper;
 
   // Format authors: "Last, First and Last, First"
@@ -89,8 +90,6 @@ const generateBibTeX = (paper: Paper): string => {
   title  = {${escapeBibTeX(title)}},
   journal = {${escapeBibTeX(venue)}},
   year   = {${year}},
-  doi    = {${escapeBibTeX(doi)}},
-  url    = {${escapeBibTeX(url)}},
   abstract = {${escapeBibTeX(abstract)}}
 }`;
 
@@ -154,15 +153,19 @@ app.get('/api/search', (req: Request<{}, {}, {}, SearchQuery>, res: Response) =>
 
           // TODO: Some type for the Semantic Scholar response
           res.json(
-            papersWithSavedStatus.map((paper: any) => ({
+            papersWithSavedStatus.map((paper: any): Paper => ({
               id: paper.paperId,
               title: paper.title,
               authors: paper.authors.map((auth: any) => auth.name),
               abstract: paper.abstract || 'N/A',
               year: paper.year || 'N/A',
               venue: paper.venue || 'N/A',
-              doi: paper.externalIds?.DOI || 'N/A',
-              url: paper.url || 'N/A',
+              doi: paper.externalIds?.DOI || undefined,
+              urls: {
+                semanticScholar: paper.url || undefined,
+                arxiv: (paper.venue === 'arXiv.org' && paper.externalIds?.DOI) ?
+                  `https://doi.org/${paper.externalIds?.DOI}` : undefined
+              },
               saved: paper.saved
             }))
           )

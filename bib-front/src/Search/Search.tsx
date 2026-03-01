@@ -3,6 +3,7 @@ import './Search.css';
 import axios from 'axios';
 import { Paper } from './../types';
 import { toast } from 'react-toastify';
+import PaperInfo from '../PaperInfo/PaperInfo';
 
 interface SearchProps {
   savedPapers: undefined | Paper[];
@@ -130,49 +131,9 @@ interface PaperCardProps {
 }
 
 const PaperCard: React.FC<PaperCardProps> = ({ paper, onSave, isSaving, isSaved }) => {
-  const renderAuthors = (authors?: string[]): string => {
-    if (!authors || authors.length === 0) return 'Unknown authors';
-
-    if (typeof authors[0] === 'string') {
-      return (authors as string[]).join(', ');
-    }
-
-    return authors.join(', ');
-  };
-
   return (
     <article className="paper-card">
-      <div className="paper-content">
-        <h4 className="paper-title">{paper.title}</h4>
-        {paper.authors && (
-          <p className="paper-authors">
-            <strong>Authors:</strong> {renderAuthors(paper.authors)}
-          </p>
-        )}
-        {paper.abstract && (
-          <p className="paper-abstract">{paper.abstract}</p>
-        )}
-        {paper.year && (
-          <p className="paper-year">
-            <strong>Year:</strong> {paper.year}
-          </p>
-        )}
-        {paper.venue && (
-          <p className="paper-venue">
-            <strong>Venue:</strong> {paper.venue}
-          </p>
-        )}
-        {paper.doi && (
-          <p className="paper-doi">
-            <strong>DOI:</strong> {paper.doi}
-          </p>
-        )}
-        {paper.url && (
-          <p className="paper-url">
-            <strong>URL:</strong> <a href={paper.url} target="_blank" rel="noopener noreferrer">{paper.url}</a>
-          </p>
-        )}
-      </div>
+      <PaperInfo paper={paper} filterQuery="" />
       <div className="paper-actions">
         <button
           onClick={onSave}

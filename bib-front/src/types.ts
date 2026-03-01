@@ -5,7 +5,10 @@ export interface Paper {
   abstract: string;
   year: number;
   venue: string;
-  doi: string;
-  url: string;
+  doi?: string;
+  urls: {
+    semanticScholar?: string;
+    arxiv?: string;
+  }
   saved: boolean;
 }

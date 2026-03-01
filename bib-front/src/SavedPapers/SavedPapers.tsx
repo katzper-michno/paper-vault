@@ -4,6 +4,7 @@ import axios from 'axios';
 import BibTeXModal from './../BibTeXModal/BibTeXModal';
 import { Paper } from './../types';
 import { toast } from 'react-toastify';
+import PaperInfo from '../PaperInfo/PaperInfo';
 
 interface LoadingState {
   delete: string | null;
@@ -73,7 +74,7 @@ const SavedPapers = ({ savedPapers, onDeletedPaperSuccess }: SavedPapersProps) =
   }
 
   return (
-    <section className="saved-section">
+    <div className="saved-section">
       <h2>Saved Papers</h2>
 
       <div className="filter-container">
@@ -90,31 +91,9 @@ const SavedPapers = ({ savedPapers, onDeletedPaperSuccess }: SavedPapersProps) =
       <div className="saved-container">
         {savedPapersDiv()}
       </div>
-    </section>
+    </div>
   );
 }
-
-const HighlightedText: React.FC<{ text: string, query: string }> = ({ text, query }) => {
-  if (!query) return <>{text}</>;
-
-  const regex = new RegExp(`(${query})`, "gi");
-
-  const parts = text.split(regex);
-
-  return (
-    <>
-      {parts.map((part, index) =>
-        regex.test(part) ? (
-          <span key={index} style={{ backgroundColor: "yellow" }}>
-            {part}
-          </span>
-        ) : (
-          part
-        )
-      )}
-    </>
-  );
-};
 
 interface SavedPaperCardProps {
   paper: Paper;
@@ -124,49 +103,12 @@ interface SavedPaperCardProps {
 }
 
 const SavedPaperCard: React.FC<SavedPaperCardProps> = ({ paper, filterQuery, onDelete, isDeleting }) => {
-  const renderAuthors = (): string => {
-    if (paper.authors.length === 0) return 'Unknown authors';
-    else return paper.authors.join(', ');
-  }
-
   return (
     <article className="saved-paper-card">
-      <div className="paper-content">
-        <h4 className="paper-title">
-          <HighlightedText text={paper.title} query={filterQuery} />
-        </h4>
-        {paper.authors && (
-          <p className="paper-authors">
-            <strong>Authors: </strong>
-            <HighlightedText text={renderAuthors()} query={filterQuery} />
-          </p>
-        )}
-        {paper.abstract && (
-          <p className="paper-abstract">
-            <HighlightedText text={paper.abstract} query={filterQuery} />
-          </p>
-        )}
-        {paper.year && (
-          <p className="paper-year">
-            <strong>Year:</strong> {paper.year}
-          </p>
-        )}
-        {paper.venue && (
-          <p className="paper-venue">
-            <strong>Venue:</strong> {paper.venue}
-          </p>
-        )}
-        {paper.doi && (
-          <p className="paper-doi">
-            <strong>DOI:</strong> {paper.doi}
-          </p>
-        )}
-        {paper.url && (
-          <p className="paper-url">
-            <strong>URL:</strong> <a href={paper.url} target="_blank" rel="noopener noreferrer">{paper.url}</a>
-          </p>
-        )}
-      </div>
+      <PaperInfo
+        paper={paper}
+        filterQuery={filterQuery}
+      />
       <div className="paper-actions">
         <BibTeXModal paperId={paper.id} />
         <button
