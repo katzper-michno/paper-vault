@@ -1,18 +1,19 @@
 [
   {
-    "id": "073c3447046c77c47590aaebab06919e0c59f71d",
-    "title": "Polyregular Functions",
+    "id": "64d9f640ed4a5741796873b78991b8a1b498e0fa",
+    "title": "On Boolean PCSPs with Polynomial Threshold Polymorphisms",
     "authors": [
-      "Mikolaj Bojanczyk"
+      "Katzper Michno"
     ],
-    "abstract": "This paper is about certain string-to-string functions, called the polyregular functions. These are like the regular string-to-string functions, except that they can have polynomial (and not just linear) growth. The class has four equivalent definitions: 1. deterministic two-way transducers with pebbles; 2 the smallest class of string-to-string functions that is closed under composition, contains all sequential functions as well as two extra functions called squaring and iterated reverse 3. a fragment of the lambda-calculus, which has a list type constructor and limited forms of iteration such as map but not fold; 4. an imperative programming language, which has for loops that range over input positions. The first definition comes from [milo2003typechecking], while the remaining three are new to the author's best knowledge. The class of polyregular functions contains known classes of string-to-string transducers, such as the sequential, rational, or regular ones, but goes beyond them because of super-linear growth. Polyregular functions have good algorithmic properties, such as: - the output can be computed in linear time (in terms of combined input and output size); - the inverse image of a regular word language is (effectively) regular. We also identify a fragment of polyregular functions, called the first-order polyregular functions, which has additional good properties, e.g. the output can be computed by an AC0 circuit.",
-    "year": 2018,
+    "abstract": "In pursuit of a deeper understanding of Boolean Promise Constraint Satisfaction Problems (PCSPs), we identify a class of problems with restricted structural complexity, which could serve as a promising candidate for complete characterization. Specifically, we investigate the class of PCSPs whose polymorphisms are Polynomial Threshold Functions (PTFs) of bounded degree. We obtain two complexity characterization results: (1) with a hardness condition introduced in [ACMTCT'21], we establish a complete complexity dichotomy in the case where coefficients of PTF representations are non-negative; (2) dropping the non-negativity assumption, we show a hardness result for PTFs admitting coordinates with significant influence, conditioned on the Rich 2-to-1 Conjecture proposed in [ITCS'21]. In order to prove the latter, we show that a random 2-to-1 minor map retains significant coordinate influence over the $p$-biased hypercube with constant probability.",
+    "year": 2025,
     "venue": "arXiv.org",
-    "doi": "10.48550/arXiv.1810.08760",
+    "doi": "10.48550/arXiv.2509.26248",
     "urls": {
-      "semanticScholar": "https://www.semanticscholar.org/paper/073c3447046c77c47590aaebab06919e0c59f71d",
-      "arxiv": "https://arxiv.org/abs/1810.08760"
-    }
+      "semanticScholar": "https://www.semanticscholar.org/paper/64d9f640ed4a5741796873b78991b8a1b498e0fa",
+      "arxiv": "https://doi.org/10.48550/arXiv.2509.26248"
+    },
+    "files": []
   },
   {
     "id": "c971228df99d26d8d1fd32ff2edda0bb158e7901",
@@ -26,8 +27,9 @@
     "venue": "arXiv.org",
     "doi": "10.48550/arXiv.2410.03444",
     "urls": {
-        "semanticScholar": "https://www.semanticscholar.org/paper/c971228df99d26d8d1fd32ff2edda0bb158e7901",
-        "arxiv": "https://arxiv.org/abs/2410.03444"
-    }
+      "semanticScholar": "https://www.semanticscholar.org/paper/c971228df99d26d8d1fd32ff2edda0bb158e7901",
+      "arxiv": "https://arxiv.org/abs/2410.03444"
+    },
+    "files": []
   }
 ]

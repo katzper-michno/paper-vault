@@ -24,6 +24,7 @@ interface Paper {
     semanticScholar?: string;
     arxiv?: string;
   }
+  files?: string[];
   saved?: boolean;
 }
 
@@ -111,11 +112,12 @@ app.get('/api/search', (req: Request<{}, {}, {}, SearchQuery>, res: Response) =>
       const searchUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(searchTerm)}`
         + `&limit=10&fields=title,authors,year,venue,paperId,abstract,externalIds,url`;
 
+      console.log(`Sending request with URL: ${searchUrl}`);
+
       getPapersFromDatabase().then((savedPapers: Paper[]) => {
         axios.get(searchUrl, {
           headers: {
-            'x-api-key': process.env.SEMANTIC_SCHOLAR_API_KEY,
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            // 'x-api-key': process.env.SEMANTIC_SCHOLAR_API_KEY
           },
           timeout: 10000,
           validateStatus: function(status) {
@@ -207,8 +209,14 @@ app.post('/api/papers', (req: Request, res: Response) => {
         return res.status(409).json({ message: 'Paper already saved' });
       }
 
-      savePapersToDatabase([paper, ...savedPapers]);
-      res.status(201).json({ ...paper, saved: true })
+      const paperToSave = { ...paper, files: paper.files ?? [] };
+      savePapersToDatabase(
+        [
+          paperToSave, 
+          ...savedPapers
+        ]
+      );
+      res.status(201).json({ ...paperToSave, saved: true })
     }, 400);
   })
 });
