@@ -5,29 +5,21 @@ import { toast } from "react-toastify";
 import { WebResultCard } from "./WebResultCard";
 
 interface WebSearchPanelProps {
-  open: boolean;
+  isOpen: boolean;
   savedIds: Set<string>;
-  onSavedPaperSuccess: (paper: Paper) => void;
+  onSave: (paper: WebPaper) => Promise<void>;
 }
 
-interface LoadingState {
-  search: boolean;
-  save: string | null;
-}
-
-export const WebSearchPanel: React.FC<WebSearchPanelProps> = ({ 
-  open, 
-  savedIds, 
-  onSavedPaperSuccess 
+export const WebSearchPanel: React.FC<WebSearchPanelProps> = ({
+  isOpen,
+  savedIds,
+  onSave
 }) => {
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Paper[]>([]);
-  const [loading, setLoading] = useState<LoadingState>({
-    search: false,
-    save: null
-  });
+  const [searching, setSearching] = useState<boolean>(false);
 
   useEffect(() => {
     setSearchResults(prev =>
@@ -40,37 +32,25 @@ export const WebSearchPanel: React.FC<WebSearchPanelProps> = ({
 
   const handleSearch = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+
     if (!searchQuery.trim()) return;
 
-    setLoading(prev => ({ ...prev, search: true }));
+    setSearching(true);
+
     try {
       const res = await axios.get<Paper[]>(`${SERVER_HOST}/search?q=${encodeURIComponent(searchQuery)}`);
       setSearchResults(res.data);
     } catch (err: any) {
       console.error(err);
       setSearchResults([])
-      toast.error(`Error searching papers: ${err.response.data.message}`);
+      toast.error(`Error searching papers: ${err.response?.data.message || err}`);
     } finally {
-      setLoading(prev => ({ ...prev, search: false }));
-    }
-  };
-
-  const handleSavePaper = async (paper: WebPaper): Promise<void> => {
-    setLoading(prev => ({ ...prev, save: paper.id }));
-
-    try {
-      const res = await axios.post<Paper>(`${SERVER_HOST}/papers`, paper);
-      onSavedPaperSuccess(res.data);
-    } catch (err: any) {
-      console.error('Error saving paper:', err);
-      toast.error(`Error saving paper: ${err.response.data.message}`);
-    } finally {
-      setLoading(prev => ({ ...prev, save: null }));
+      setSearching(false);
     }
   };
 
   return (
-    <div className={`web-panel${open ? ' open' : ''}`}>
+    <div className={`web-panel${isOpen ? ' open' : ''}`}>
       <div className="web-panel-inner">
         <div className="web-search-bar">
           <form onSubmit={handleSearch} className="web-input-wrap">
@@ -80,12 +60,12 @@ export const WebSearchPanel: React.FC<WebSearchPanelProps> = ({
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
-            <button 
+            <button
               type="submit"
-              disabled={loading.search}
+              disabled={searching}
               className="go-btn"
             >
-              {loading.search ? 'Searching...' : 'Search'}
+              {searching ? 'Searching...' : 'Search'}
             </button>
           </form>
         </div>
@@ -96,12 +76,11 @@ export const WebSearchPanel: React.FC<WebSearchPanelProps> = ({
               searchResults.map(p => (
                 <WebResultCard
                   key={p.id}
-                  isAddingDisabled={loading.save === p.id}
                   paper={p}
-                  saved={savedIds.has(p.id)}
-                  onSave={handleSavePaper}
+                  isSaved={savedIds.has(p.id)}
+                  onSave={onSave}
                 />
-              ))) 
+              )))
               : <div className="empty-state">No papers match your search.</div>
           }
         </div>

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
 interface LinkProps {
-  arxiv: string | null;
-  ss: string | null;
+  arxiv?: string;
+  semanticScholar?: string;
 }
 
-export const ExtLinks: React.FC<LinkProps> = ({ arxiv, ss }) => (
+export const ExtLinks: React.FC<LinkProps> = ({ arxiv, semanticScholar }) => (
   <div className="ext-links">
     {arxiv && (
       <a
@@ -17,10 +17,10 @@ export const ExtLinks: React.FC<LinkProps> = ({ arxiv, ss }) => (
         ↗ arXiv
       </a>
     )}
-    {ss && (
+    {semanticScholar && (
       <a
         className="ext-link ss"
-        href={ss}
+        href={semanticScholar}
         target="_blank"
         rel="noreferrer"
       >
@@ -31,10 +31,10 @@ export const ExtLinks: React.FC<LinkProps> = ({ arxiv, ss }) => (
 );
 
 export const DoiRow: React.FC<{ doi: string }> = ({ doi }) =>
-    <div className="doi-row">
-      <span className="doi-lbl">DOI</span>
-      {doi ?? "N/A"}
-    </div>
+  <div className="doi-row">
+    <span className="doi-lbl">DOI</span>
+    {doi ?? "N/A"}
+  </div>
 
 export const HighlightedText = ({ text, query }: { text: string, query: string }) => {
   const regex = new RegExp(`(${query})`, "gi");
@@ -53,7 +53,7 @@ export const HighlightedText = ({ text, query }: { text: string, query: string }
   return <>{highlightedText} </>
 };
 
-export const Abstract: React.FC<{ 
+export const Abstract: React.FC<{
   text: string,
   filterQuery: string
 }> = ({ text, filterQuery }) => {
@@ -82,11 +82,11 @@ export const Abstract: React.FC<{
   const toggleExpand = () => setIsAbsExpanded(prev => !prev);
 
   return <div className="abstract">
-        <HighlightedText text={abstractText()} query={filterQuery} />
-        {(isAbsCollapsible) &&
-          <span onClick={toggleExpand} className="abstract-expand">
-            {(isAbsExpanded) ? "△ Less" : "▽ More"}
-          </span>
-        }
-      </div>
+    <HighlightedText text={abstractText()} query={filterQuery} />
+    {(isAbsCollapsible) &&
+      <span onClick={toggleExpand} className="abstract-expand">
+        {(isAbsExpanded) ? "△ Less" : "▽ More"}
+      </span>
+    }
+  </div>
 }

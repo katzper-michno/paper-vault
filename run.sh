@@ -23,9 +23,9 @@ BACK_PID=$!
 echo "Starting frontend..."
 
 (
-  cd bib-front
+  cd papervault
   npm install
-  npm start
+  npm run dev
 ) &
 
 FRONT_PID=$!

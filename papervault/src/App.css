@@ -559,22 +559,21 @@
 
 /* ── Web search panel ── */
 .web-panel {
-  width: 0;
-  flex-shrink: 0;
+  flex: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg0);
   border-left: 0.5px solid var(--border0);
-  transition: width 0.25s ease;
+  transition: flex 0.25s ease;
 }
 
 .web-panel.open {
-  width: 600px;
+  flex: 1;
 }
 
 .web-panel-inner {
-  width: 600px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -766,6 +765,45 @@
 
 .mrow .mfield {
   flex: 1;
+}
+
+.mbtn-del-author {
+  font-size: 16px;
+  padding: 2px 10px;
+  margin-bottom: 10px;
+  border: 0.5px solid var(--border1);
+  border-radius: 6px;
+  background: var(--bg1);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.mbtn-del-author:hover {
+  background: var(--del-h-bg);
+  border-color: var(--del-h-bd);
+  color: var(--del-h-tx);
+}
+
+.mbtn-add-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 0.5px solid var(--border1);
+  background: var(--bg0);
+  color: var(--text1);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.mbtn-add-author:hover {
+  background: var(--save-h-bg);
+  border-color: var(--save-h-bd);
+  color: var(--save-h-tx);
 }
 
 .mactions {

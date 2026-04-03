@@ -153,7 +153,6 @@ app.get('/api/search', (req: Request<{}, {}, {}, SearchQuery>, res: Response) =>
             saved: savedPapers.some(saved => getPaperId(saved) === getPaperId(paper))
           }));
 
-          // TODO: Some type for the Semantic Scholar response
           res.json(
             papersWithSavedStatus.map((paper: any): Paper => ({
               id: paper.paperId,
@@ -177,7 +176,7 @@ app.get('/api/search', (req: Request<{}, {}, {}, SearchQuery>, res: Response) =>
       console.error('Search error:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
-  }, 500);
+  }, 5000);
 });
 
 // Get a list of all saved papers
@@ -206,18 +205,40 @@ app.post('/api/papers', (req: Request, res: Response) => {
   getPapersFromDatabase().then((savedPapers: Paper[]) => {
     setTimeout(() => {
       if (savedPapers.some(p => p.id === paper.id)) {
-        return res.status(409).json({ message: 'Paper already saved' });
+        return res.status(409).json({ message: `Paper ${paper.id} already saved` });
       }
 
       const paperToSave = { ...paper, files: paper.files ?? [] };
       savePapersToDatabase(
         [
-          paperToSave, 
+          paperToSave,
           ...savedPapers
         ]
       );
       res.status(201).json({ ...paperToSave, saved: true })
     }, 400);
+  })
+});
+
+// Update a paper
+app.put('/api/papers/:id', (req: Request, res: Response) => {
+  const paper = req.body as Paper;
+  delete paper.saved;
+
+  getPapersFromDatabase().then((savedPapers: Paper[]) => {
+    setTimeout(() => {
+      const idx = savedPapers.findIndex((p: Paper) => p.id === paper.id);
+
+      if (idx === -1) {
+        return res.status(404).json({ message: `No paper found with id ${paper.id}` });
+      }
+
+      savedPapers[idx] = paper;
+
+      savePapersToDatabase(savedPapers);
+
+      res.json({ message: `Paper ${paper.id} updated successfully` });
+    }, 300);
   })
 });
 
@@ -233,33 +254,10 @@ app.delete('/api/papers/:id', (req: Request<{ id: string }>, res: Response) => {
 
       savePapersToDatabase(savedPapers.filter((p: Paper) => p.id !== id));
 
-      res.json({ message: 'Paper removed successfully' });
+      res.json({ message: `Paper ${id} removed successfully` });
     }, 300);
   })
 });
-
-// Get a specific paper
-// app.get('/api/papers/:id', (req: Request<{ id: string }>, res: Response) => {
-//   const { id } = req.params;
-//
-//   setTimeout(() => {
-//     const paper = mockPapers.find(p => p.id === id) ||
-//       savedPapers.find(p => p.id === id);
-//
-//     if (!paper) {
-//       return res.status(404).json({ error: 'Paper not found' });
-//     }
-//
-//     const isSaved = savedPapers.some(p => p.id === id);
-//     const savedPaper = savedPapers.find(p => p.id === id);
-//
-//     res.json({
-//       ...paper,
-//       saved: isSaved,
-//       savedDate: savedPaper?.savedDate
-//     });
-//   }, 200);
-// });
 
 // Generate BibTeX for specified paper
 app.get('/api/papers/:id/bibtex', (req: Request<{ id: string }>, res: Response) => {
@@ -290,10 +288,10 @@ app.use((_req: Request, res: Response) => {
 app.listen(process.env.PORT, () => {
   console.log(`Bibliography server running on http://localhost:${process.env.PORT}`);
   console.log(`Available endpoints:`);
-  console.log(`   GET  /api/search?q=:query`);
-  console.log(`   GET  /api/papers`);
-  console.log(`   POST /api/papers`);
-  // console.log(`   GET  /api/papers/:id`);
+  console.log(`   GET    /api/search?q=:query`);
+  console.log(`   GET    /api/papers`);
+  console.log(`   POST   /api/papers`);
+  console.log(`   PUT    /api/papers/:id`);
   console.log(`   DELETE /api/papers/:id`);
-  console.log(`   GET /api/paper/:id/bibtex`)
+  console.log(`   GET    /api/paper/:id/bibtex`)
 });

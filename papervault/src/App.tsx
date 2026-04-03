@@ -1,37 +1,54 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Paper, WebPaper, EditFormValues } from './types.ts';
-import { PaperCard } from './components/PaperCard.tsx';
+import React, { useState, useEffect, useRef } from 'react';
+import { Paper, EditFormValues, WebPaper } from './types.ts';
 import { EditModal } from './components/EditModal';
 
 import './App.css';
 import { WebSearchPanel } from './components/WebSearchPanel.tsx';
-import { Slide, ToastContainer } from 'react-toastify';
+import { Slide, toast, ToastContainer } from 'react-toastify';
 import axios from 'axios';
 import { VaultPanel } from './components/VaultPanel.tsx';
 
-interface LoadingState {
-  load: boolean;
+const useTheme = () => {
+  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+
+  const [theme, setTheme] = useState<"light" | "dark">(
+    () => (localStorage.getItem("theme") as "light" | "dark") ?? systemTheme
+  );
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+    document.documentElement.classList.toggle("dark", theme === "dark"); // if using Tailwind
+  }, [theme]);
+
+  return { theme, setTheme };
 }
 
 const App: React.FC = () => {
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
+
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
 
   const [panelOpen, setPanelOpen] = useState(false);
-  const [dark, setDark] = useState(false);
+
   const [editingPaper, setEditingPaper] = useState<Paper | null>(null);
+  const editingPromise = useRef<{ promise?: Promise<void>, resolve?: () => void }>({})
+
   const [libraryQuery, setLibraryQuery] = useState('');
 
   const [savedPapers, setSavedPapers] = useState<Paper[]>([]);
-  const [loading, setLoading] = useState<LoadingState>({ load: false });
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const savedIds: Set<string> = new Set(savedPapers.map((p : Paper) => p.id));
+  const savedIds: Set<string> = new Set(savedPapers.map((p: Paper) => p.id));
 
   useEffect(() => {
-    fetchSavedPapers();
+    fetchSavedPapers()
   }, []);
 
   const fetchSavedPapers = async (): Promise<void> => {
-    setLoading(prev => ({ ...prev, load: true }));
+    setLoading(true);
+
     try {
       const res = await axios.get<Paper[]>(`${SERVER_HOST}/papers`);
       setSavedPapers(res.data);
@@ -39,45 +56,85 @@ const App: React.FC = () => {
       console.error(err);
       setSavedPapers(err.response.data.message);
     } finally {
-      setLoading(prev => ({ ...prev, load: false }));
+      setLoading(false);
     }
   };
 
-  const handleRemove = useCallback((id: string) => {
-    setSavedPapers(prev => prev.filter(p => p.id !== id));
-  }, []);
+  const handleRemove = async (id: string): Promise<void> => {
+    try {
+      await axios.delete(`${SERVER_HOST}/papers/${id}`);
+      setSavedPapers(prev => prev.filter(p => p.id !== id));
+    } catch (err: any) {
+      console.error('Error deleting paper:', err);
+      toast.error(`Error deleting paper ${err.response.data.message}`)
+    }
+  };
 
-  const handleSaved = useCallback((paper: Paper) => {
-    setSavedPapers(prev => [paper, ...prev]);
-  }, []);
+  const handleSave = async (paper: WebPaper): Promise<void> => {
+    try {
+      const res = await axios.post<Paper>(`${SERVER_HOST}/papers`, paper);
+      setSavedPapers(prev => [res.data, ...prev]);
+    } catch (err: any) {
+      console.error('Error saving paper:', err);
+      toast.error(`Error saving paper: ${err.response.data.message}`);
+    }
+  };
 
-  /* const handleEdit = useCallback((paper: Paper) => {
-    setEditingPaper(paper);
-  }, []);*/
+  const handleEdit = async (paperId: string): Promise<void> => {
+    const paperToEdit = savedPapers.filter(p => p.id === paperId)[0];
+    const deferred: { promise?: Promise<void>, resolve?: () => void } = {};
+    deferred.promise = new Promise((res, _) => {
+      deferred.resolve = res;
+    });
+    editingPromise.current = deferred;
+    setEditingPaper(paperToEdit);
+    return editingPromise.current.promise;
+  };
 
-  const handleSaveEdit = useCallback((id: string, values: EditFormValues) => {
-    setSavedPapers(prev =>
-      prev.map(p =>
-        p.id === id
-          ? {
-              ...p,
-              title: values.title,
-              authors: values.authors,
-              venue: values.venue,
-              year: values.year,
-              doi: values.doi,
-              arxiv: values.urls.arxiv || null,
-              ss: values.urls.semanticScholar || null,
-              abstract: values.abstract,
-            }
-          : p
-      )
-    );
+  const handleSaveEdit = async (id: string, values: EditFormValues): Promise<void> => {
+    let paper: Paper = savedPapers.find((p: Paper) => p.id === id)!;
+
+    paper = {
+      ...paper,
+      title: values.title,
+      authors: values.authors,
+      venue: values.venue,
+      year: values.year,
+      doi: values.doi,
+      urls: {
+        arxiv: values.urls.arxiv,
+        semanticScholar: values.urls.semanticScholar
+      },
+      abstract: values.abstract
+    }
+
+    try {
+      await axios.put(`${SERVER_HOST}/papers/${id}`, paper);
+
+      setSavedPapers(prev =>
+        prev.map((p: Paper): Paper =>
+          p.id === id
+            ? paper : p
+        )
+      );
+    } catch (err: any) {
+      console.error('Error deleting paper:', err);
+      toast.error(`Error deleting paper ${err.response.data.message}`)
+    } finally {
+      setEditingPaper(null);
+      editingPromise.current.resolve!();
+      editingPromise.current = {};
+    }
+  };
+
+  const handleCloseModal = () => {
     setEditingPaper(null);
-  }, []);
+    editingPromise.current.resolve!();
+    editingPromise.current = {};
+  }
 
   return (
-    <div id="root" className={dark ? 'dark' : ''}>
+    <div id="root" className={theme === 'dark' ? 'dark' : ''}>
       <div className="app">
         {/* ── Topbar ── */}
         <div className="topbar">
@@ -94,14 +151,14 @@ const App: React.FC = () => {
           <div className="topbar-right">
             <button
               className="icon-btn"
-              onClick={() => setDark(d => !d)}
+              onClick={toggleTheme}
               title="Toggle light/dark mode"
             >
-              {dark ? '☽' : '☀'}
+              {theme === 'dark' ? '☽' : '☀'}
             </button>
 
             <button
-              disabled={loading.load}
+              disabled={loading}
               className={`web-toggle${panelOpen ? ' active' : ''}`}
               onClick={() => setPanelOpen(o => !o)}
             >
@@ -114,47 +171,44 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Main ── */}
         <div className="main">
-          {/* Library panel */}
-          <VaultPanel 
-            savedPapers={loading.load ? undefined : savedPapers}
+          <VaultPanel
+            savedPapers={loading ? undefined : savedPapers}
             filterQuery={libraryQuery.toLowerCase()}
-            onDeletedPaperSuccess={handleRemove}
+            onDelete={handleRemove}
+            onEdit={handleEdit}
           />
 
           {/* Divider */}
           <div className={`divider${panelOpen ? ' visible' : ''}`} />
 
-          {/* Web search panel */}
           <WebSearchPanel
-            open={!loading.load && panelOpen}
+            isOpen={!loading && panelOpen}
             savedIds={savedIds}
-            onSavedPaperSuccess={handleSaved} 
+            onSave={handleSave}
           />
         </div>
       </div>
 
-      {/* Edit modal */}
       <EditModal
         paper={editingPaper}
-        onClose={() => setEditingPaper(null)}
+        onClose={handleCloseModal}
         onSave={handleSaveEdit}
       />
 
       <ToastContainer
-          position="bottom-left"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-          transition={Slide}
-        />
+        position="bottom-left"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Slide}
+      />
     </div>
   );
 };

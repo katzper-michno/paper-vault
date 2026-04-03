@@ -6,8 +6,8 @@ export interface EditFormValues {
   year: number;
   doi: string;
   urls: {
-    semanticScholar: string | null;
-    arxiv: string | null;
+    semanticScholar?: string;
+    arxiv?: string;
   }
 }
 

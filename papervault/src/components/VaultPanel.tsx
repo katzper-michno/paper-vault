@@ -1,44 +1,14 @@
-import axios from "axios";
 import { Paper } from "../types";
-import { toast } from "react-toastify";
-import { useState } from "react";
 import { PaperCard } from "./PaperCard";
-
-interface LoadingState {
-  delete: string | null;
-}
 
 interface VaultPanelProps {
   savedPapers?: undefined | Paper[];
   filterQuery: string;
-  onDeletedPaperSuccess: (deletedId: string) => void;
+  onEdit: (id: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
-export const VaultPanel: React.FC<VaultPanelProps> = ({ savedPapers, filterQuery, onDeletedPaperSuccess }) => {
-  const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
-
-  const [loading, setLoading] = useState<LoadingState>({
-    delete: null,
-  });
-
-  const handleDeletePaper = async (paperId: string): Promise<void> => {
-    setLoading(prev => ({ ...prev, delete: paperId }));
-
-    try {
-      await axios.delete(`${SERVER_HOST}/papers/${paperId}`);
-      onDeletedPaperSuccess(paperId);
-    } catch (err: any) {
-      console.error('Error deleting paper:', err);
-      toast.error(`Error deleting paper ${err.response.data.message}`)
-    } finally {
-      setLoading({ delete: null });
-    }
-  };
-
-  const handleEditPaper = () => {
-    window.alert("Editing is not yet implemented...")
-  }
-
+export const VaultPanel: React.FC<VaultPanelProps> = ({ savedPapers, filterQuery, onEdit, onDelete }) => {
   const filteredSavedPapers: Paper[] = (savedPapers) ?
     savedPapers.filter(paper =>
       paper.title.toLowerCase().includes(filterQuery) ||
@@ -53,10 +23,9 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({ savedPapers, filterQuery
           <PaperCard
             key={p.id}
             paper={p}
-            isRemoveDisabled={loading.delete === p.id}
             filterQuery={filterQuery}
-            onEdit={handleEditPaper}
-            onRemove={handleDeletePaper}
+            onEdit={onEdit}
+            onDelete={onDelete}
           />
         ))}
         {filteredSavedPapers.length === 0 && (

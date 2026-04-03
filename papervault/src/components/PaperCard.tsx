@@ -4,16 +4,31 @@ import { ExtLinks, DoiRow, Abstract, HighlightedText } from './PaperMeta';
 
 interface PaperCardProps {
   paper: Paper;
-  isRemoveDisabled: boolean;
   filterQuery: string;
-  onEdit: (paper: Paper) => void;
-  onRemove: (id: string) => void;
+  onEdit: (id: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
-export const PaperCard: React.FC<PaperCardProps> = ({ paper, isRemoveDisabled, filterQuery, onEdit, onRemove }) => {
+export const PaperCard: React.FC<PaperCardProps> = ({ paper, filterQuery, onEdit, onDelete }) => {
   const [filesOpen, setFilesOpen] = useState<boolean>(false);
+  const [isEdited, setIsEdited] = useState<boolean>(false);
+  const [isDeleted, setIsDeleted] = useState<boolean>(false);
+
+  const modifyLock = isEdited || isDeleted;
 
   const fileCount = paper.files.length;
+
+  const handleEdit = async () => {
+    setIsEdited(true);
+    await onEdit(paper.id);
+    setIsEdited(false);
+  };
+
+  const handleDelete = async () => {
+    setIsDeleted(true);
+    await onDelete(paper.id);
+    setIsDeleted(false);
+  };
 
   return (
     <div className="paper-card">
@@ -27,13 +42,18 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, isRemoveDisabled, f
           </div>
         </div>
         <div className="card-actions">
-          <button className="act-btn" onClick={() => onEdit(paper)}>Edit</button>
-          <button 
-            disabled={isRemoveDisabled}
-            className="act-btn del" 
-            onClick={() => onRemove(paper.id)}
+          <button
+            className="act-btn"
+            onClick={handleEdit}
           >
-            {(isRemoveDisabled) ? 'Removing...' : 'Remove'}
+            {(isEdited) ? 'Editing...' : 'Edit'}
+          </button>
+          <button
+            disabled={modifyLock}
+            className="act-btn del"
+            onClick={handleDelete}
+          >
+            {(isDeleted) ? 'Removing...' : 'Remove'}
           </button>
         </div>
       </div>
@@ -44,7 +64,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, isRemoveDisabled, f
       </div>
 
       <DoiRow doi={paper.doi} />
-      <ExtLinks arxiv={paper.urls.arxiv} ss={paper.urls.semanticScholar} />
+      <ExtLinks arxiv={paper.urls.arxiv} semanticScholar={paper.urls.semanticScholar} />
 
       <Abstract text={paper.abstract} filterQuery={filterQuery} />
 
@@ -56,7 +76,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, isRemoveDisabled, f
               ? `${fileCount} attached file${fileCount > 1 ? 's' : ''}`
               : 'No files'}
           </button>
-          <button 
+          <button
             onClick={() => window.alert('Attaching files is not yet implemented...')}
             className="attach-btn"
           >
