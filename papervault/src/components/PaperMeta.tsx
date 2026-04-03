@@ -27,6 +27,16 @@ export const ExtLinks: React.FC<LinkProps> = ({ arxiv, semanticScholar }) => (
         ↗ Semantic Scholar
       </a>
     )}
+    {
+      <a
+        className="ext-link ss"
+        href={semanticScholar}
+        target="_blank"
+        rel="noreferrer"
+      >
+        ↗ Sci Hub
+      </a>
+    }
   </div>
 );
 
