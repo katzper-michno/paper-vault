@@ -109,7 +109,7 @@
 .topbar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   padding: 10px 14px;
   background: var(--bg0);
   border-bottom: 0.5px solid var(--border0);
@@ -478,7 +478,7 @@
   transform: rotate(90deg);
 }
 
-.attach-btn {
+.act-files-btn {
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -492,13 +492,19 @@
   transition: all 0.12s;
 }
 
-.attach-btn:hover {
+.act-files-btn:hover {
   border-color: var(--border2);
   color: var(--text0);
 }
 
+.act-files-btn.attach:hover {
+  background: var(--saved-bg);
+  border-color: var(--saved-bd);
+  color: var(--saved-tx);
+}
+
 .files-list {
-  margin-top: 5px;
+  margin-top: 6px;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -530,7 +536,7 @@
   text-overflow: ellipsis;
 }
 
-.file-open {
+.act-file-btn {
   font-size: 10px;
   color: var(--text2);
   cursor: pointer;
@@ -541,9 +547,15 @@
   transition: all 0.12s;
 }
 
-.file-open:hover {
+.act-file-btn.open:hover {
   border-color: var(--border2);
   color: var(--text0);
+}
+
+.act-file-btn.del:hover {
+  background: var(--del-h-bg);
+  border-color: var(--del-h-bd);
+  color: var(--del-h-tx);
 }
 
 /* ── Divider ── */

@@ -112,9 +112,15 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, filterQuery, onEdit
           </button>
           <button
             onClick={() => window.alert('Attaching files is not yet implemented...')}
-            className="attach-btn"
+            className="act-files-btn attach"
           >
             + Attach
+          </button>
+          <button
+            onClick={() => window.alert('This is not yet implemented...')}
+            className="act-files-btn open-dir"
+          >
+            🗀 Open directory
           </button>
         </div>
 
@@ -124,7 +130,18 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, filterQuery, onEdit
               <div className="file-item" key={i}>
                 <span className="file-icon">⎙</span>
                 <span className="file-name">{f.name}</span>
-                <button className="file-open">Open</button>
+                <button
+                  className="act-file-btn open"
+                  onClick={() => window.alert('Opening files not yet implemented...')}
+                >
+                  Open
+                </button>
+                <button
+                  className="act-file-btn del"
+                  onClick={() => window.alert('Removing files not yet implemented...')}
+                >
+                  Remove
+                </button>
               </div>
             ))}
           </div>

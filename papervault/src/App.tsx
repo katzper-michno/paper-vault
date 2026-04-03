@@ -150,12 +150,23 @@ const App: React.FC = () => {
           <div className="topbar-right">
             <button
               className="icon-btn"
+              onClick={() => window.alert('Here, you will be able to manage your vault repository (push, pull, commit).')}
+            >
+              ⎇
+            </button>
+            <button
+              className="icon-btn"
+              onClick={() => window.alert('Here, you will be able to modify environment variables.')}
+            >
+              ⚙︎
+            </button>
+            <button
+              className="icon-btn"
               onClick={toggleTheme}
               title="Toggle light/dark mode"
             >
               {theme === 'dark' ? '☽' : '☀'}
             </button>
-
             <button
               disabled={loading}
               className={`web-toggle${panelOpen ? ' active' : ''}`}
