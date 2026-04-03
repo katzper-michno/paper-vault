@@ -25,7 +25,6 @@ const useTheme = () => {
 
 const App: React.FC = () => {
   const { theme, setTheme } = useTheme();
-
   const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
@@ -53,8 +52,8 @@ const App: React.FC = () => {
       const res = await axios.get<Paper[]>(`${SERVER_HOST}/papers`);
       setSavedPapers(res.data);
     } catch (err: any) {
-      console.error(err);
-      setSavedPapers(err.response.data.message);
+      console.error('Error fetching papers from the vault:', err);
+      toast.error(`Error fetching papers from the vault ${err.response?.data.message || err}`)
     } finally {
       setLoading(false);
     }
@@ -66,7 +65,7 @@ const App: React.FC = () => {
       setSavedPapers(prev => prev.filter(p => p.id !== id));
     } catch (err: any) {
       console.error('Error deleting paper:', err);
-      toast.error(`Error deleting paper ${err.response.data.message}`)
+      toast.error(`Error deleting paper ${err.response?.data.message || err}`)
     }
   };
 
@@ -76,7 +75,7 @@ const App: React.FC = () => {
       setSavedPapers(prev => [res.data, ...prev]);
     } catch (err: any) {
       console.error('Error saving paper:', err);
-      toast.error(`Error saving paper: ${err.response.data.message}`);
+      toast.error(`Error saving paper: ${err.response?.data.message || err}`);
     }
   };
 

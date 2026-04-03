@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Paper } from '../types';
 import { ExtLinks, DoiRow, Abstract, HighlightedText } from './PaperMeta';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface PaperCardProps {
   paper: Paper;
@@ -10,11 +12,16 @@ interface PaperCardProps {
 }
 
 export const PaperCard: React.FC<PaperCardProps> = ({ paper, filterQuery, onEdit, onDelete }) => {
+  const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
+
   const [filesOpen, setFilesOpen] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
   const [isDeleted, setIsDeleted] = useState<boolean>(false);
-
   const modifyLock = isEdited || isDeleted;
+
+  const [fetchingBibtex, setFetchingBibtex] = useState<boolean>(false);
+  const [copiedBibtex, setCopiedBibtex] = useState<boolean>(false);
+  const bibtexLock = fetchingBibtex || copiedBibtex;
 
   const fileCount = paper.files.length;
 
@@ -30,6 +37,22 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, filterQuery, onEdit
     setIsDeleted(false);
   };
 
+  const handleCopyBibtex = async () => {
+    setFetchingBibtex(true);
+
+    try {
+      const res = await axios.get<{ bibtex: string }>(`${SERVER_HOST}/papers/${paper.id}/bibtex`);
+      navigator.clipboard.writeText(res.data.bibtex);
+      setCopiedBibtex(true);
+      setTimeout(() => setCopiedBibtex(false), 2500);
+    } catch (err: any) {
+      console.error('Error fetching BibTeX:', err);
+      toast.error(`Error saving paper: ${err.response?.data.message || err}`);
+    } finally {
+      setTimeout(() => setFetchingBibtex(false), 500);
+    }
+  }
+
   return (
     <div className="paper-card">
       <div className="card-top">
@@ -42,6 +65,17 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, filterQuery, onEdit
           </div>
         </div>
         <div className="card-actions">
+          <button
+            disabled={bibtexLock}
+            onClick={handleCopyBibtex}
+            className="act-btn bibtex"
+          >
+            {
+              (fetchingBibtex) ? 'Generating...' : (
+                (copiedBibtex) ? '✓ Copied' : '✎ Copy BibTeX'
+              )
+            }
+          </button>
           <button
             className="act-btn"
             onClick={handleEdit}

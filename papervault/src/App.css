@@ -14,9 +14,10 @@
   --venue-bd: #97c459;
   --venue-tx: #3b6d11;
 
-  --arxiv-h-bg: #faeeda;
-  --arxiv-h-bd: #fac775;
-  --arxiv-h-tx: #854f0b;
+  --orange-bg: #faeeda;
+  --orange-bd: #fac775;
+  --orange-tx: #854f0b;
+
   --ss-h-bg: #e6f1fb;
   --ss-h-bd: #85b7eb;
   --ss-h-tx: #185fa5;
@@ -56,9 +57,9 @@
   --venue-bd: #3a6010;
   --venue-tx: #90c45a;
 
-  --arxiv-h-bg: #2a200a;
-  --arxiv-h-bd: #7a4a0a;
-  --arxiv-h-tx: #f5c070;
+  --orange-bg: #2a200a;
+  --orange-bd: #7a4a0a;
+  --orange-tx: #f5c070;
   --ss-h-bg: #0d1f34;
   --ss-h-bd: #185fa5;
   --ss-h-tx: #7ab8e8;
@@ -318,6 +319,12 @@
   color: var(--del-h-tx);
 }
 
+.act-btn.bibtex:hover {
+  background: var(--orange-bg);
+  border-color: var(--orange-bd);
+  color: var(--orange-tx);
+}
+
 .paper-title {
   font-size: 13px;
   font-weight: 500;
@@ -384,9 +391,9 @@
 }
 
 .ext-link.arxiv:hover {
-  background: var(--arxiv-h-bg);
-  border-color: var(--arxiv-h-bd);
-  color: var(--arxiv-h-tx);
+  background: var(--orange-bg);
+  border-color: var(--orange-bd);
+  color: var(--orange-tx);
 }
 
 .ext-link.ss:hover {
@@ -809,8 +816,8 @@
 }
 
 .btn-cancel {
-  padding: 5px 13px;
-  font-size: 13px;
+  padding: 4px 11px;
+  font-size: 12px;
   border-radius: 8px;
   border: 0.5px solid var(--border1);
   background: var(--bg2);
@@ -825,8 +832,8 @@
 }
 
 .btn-save {
-  padding: 5px 13px;
-  font-size: 13px;
+  padding: 4px 11px;
+  font-size: 12px;
   border-radius: 8px;
   border: none;
   background: var(--blue);

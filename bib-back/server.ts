@@ -12,6 +12,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+interface AttachedFile {
+  name: string;
+}
+
 interface Paper {
   id: string;
   title: string;
@@ -24,7 +28,7 @@ interface Paper {
     semanticScholar?: string;
     arxiv?: string;
   }
-  files?: string[];
+  files?: AttachedFile[];
   saved?: boolean;
 }
 
