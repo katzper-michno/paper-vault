@@ -12,12 +12,7 @@
     "urls": {
       "arxiv": "https://doi.org/10.48550/arXiv.2509.26248",
       "semanticScholar": "https://www.semanticscholar.org/paper/64d9f640ed4a5741796873b78991b8a1b498e0fa"
-    },
-    "files": [
-        { "name": "file1.pdf" }, 
-        { "name": "file2.pdf" }, 
-        { "name": "file3.png" }
-    ]
+    }
   },
   {
     "id": "c971228df99d26d8d1fd32ff2edda0bb158e7901",
@@ -33,7 +28,6 @@
     "urls": {
       "semanticScholar": "https://www.semanticscholar.org/paper/c971228df99d26d8d1fd32ff2edda0bb158e7901",
       "arxiv": "https://arxiv.org/abs/2410.03444"
-    },
-    "files": []
+    }
   }
 ]
