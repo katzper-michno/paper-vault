@@ -19,6 +19,7 @@ router.delete('/papers/:id', Controller.deletePaper);
 router.get('/papers/:id/bibtex', Controller.generateBibTeX);
 
 // Attached files
-router.get('/papers/:id/files/:name');
 router.post('/papers/:id/files', upload.single("file"), Controller.addFile);
-router.delete('/papers/:id/files/:name');
+router.delete('/papers/:id/files/:name', Controller.deleteFile);
+router.get('/papers/:id/files/open', Controller.openFilesDir);
+router.get('/papers/:id/files/:name/open', Controller.openFile);

@@ -1,6 +1,7 @@
 import path from "node:path";
 import { Paper } from "../types";
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import open from "open";
 
 const vaultPath = (): string => {
   const p = process.env.DB_PATH;
@@ -37,6 +38,8 @@ const getPaper = (id: string): Paper => {
   return populateWithFiles(paper);
 }
 
+const paperExists = (id: string): boolean => getPapers().some((p: Paper) => p.id === id);
+
 const savePapers = (papers: Paper[]) => {
   writeFileSync(vaultMetaPath(), JSON.stringify(papers.map(sanitizeToSave), null, 2));
 }
@@ -59,7 +62,7 @@ const updatePaper = (paper: Paper) => {
   savePapers(papers);
 }
 
-const removePaper = (id: string) => {
+const deletePaper = (id: string) => {
   const papers = getPapers();
   if (!papers.some((p: Paper) => p.id === id)) {
     throw new Error(`Paper with id ${id} not found`);
@@ -74,11 +77,27 @@ const addFile = (id: string, file: Express.Multer.File): string => {
   return file.originalname;
 }
 
+const deleteFile = (id: string, fileName: string) =>
+  rmSync(path.join(vaultPath(), 'files', id, fileName));
+
+const openFilesDir = (id: string) => {
+  const filesPath = path.join(vaultPath(), 'files', id);
+  mkdirSync(filesPath, { recursive: true });
+  open(filesPath);
+}
+
+const openFile = (id: string, fileName: string) =>
+  open(path.join(vaultPath(), 'files', id, fileName));
+
 export const VaultService = {
   getPapers,
   getPaper,
+  paperExists,
   addPaper,
   updatePaper,
-  removePaper,
-  addFile
+  deletePaper,
+  addFile,
+  deleteFile,
+  openFilesDir,
+  openFile
 }

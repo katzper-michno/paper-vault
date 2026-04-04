@@ -7,17 +7,25 @@ interface FilesRowProps {
   paper: Paper,
   onAddFile: (file: File) => Promise<void>
   onRemoveFile: (name: string) => Promise<void>
+  onOpenFilesDirectory: () => Promise<void>
   onOpenFile: (name: string) => Promise<void>
 }
 
-export const FilesRow: React.FC<FilesRowProps> = ({ paper, onAddFile, onRemoveFile, onOpenFile }) => {
+export const FilesRow: React.FC<FilesRowProps> = ({
+  paper,
+  onAddFile,
+  onRemoveFile,
+  onOpenFile,
+  onOpenFilesDirectory
+}) => {
   const [filesOpen, setFilesOpen] = useState<boolean>(false);
 
   const fileCount = paper.files.length;
 
   const [adding, setAdding] = useState<boolean>(false);
-  const [removing, setRemoving] = useState<boolean[]>(new Array(fileCount).fill(false));
-  const [opening, setOpening] = useState<boolean[]>(new Array(fileCount).fill(false));
+  const [openingDir, setOpeningDir] = useState<boolean>(false);
+  const [removing, setRemoving] = useState<string[]>([]);
+  const [opening, setOpening] = useState<string[]>([]);
 
   const { openFilePicker, loading: loadingFile } = useFilePicker({
     multiple: false,
@@ -36,15 +44,23 @@ export const FilesRow: React.FC<FilesRowProps> = ({ paper, onAddFile, onRemoveFi
   const handleAdd = openFilePicker;
 
   const handleRemove = async (idx: number) => {
-    setRemoving(prev => { prev[idx] = true; return prev });
+    const name = paper.files[idx];
+    setRemoving(prev => [...prev, name]);
     await onRemoveFile(paper.files[idx]);
-    setRemoving(prev => { prev[idx] = false; return prev });
+    setRemoving(prev => prev.filter(n => n !== name))
+  }
+
+  const handleDirOpen = async () => {
+    setOpeningDir(true);
+    await onOpenFilesDirectory();
+    setOpeningDir(false);
   }
 
   const handleOpen = async (idx: number) => {
-    setOpening(prev => { prev[idx] = true; return prev });
+    const name = paper.files[idx];
+    setOpening(prev => [...prev, name]);
     await onOpenFile(paper.files[idx]);
-    setOpening(prev => { prev[idx] = false; return prev });
+    setOpening(prev => prev.filter(n => n !== name));
   }
 
   return (
@@ -64,7 +80,8 @@ export const FilesRow: React.FC<FilesRowProps> = ({ paper, onAddFile, onRemoveFi
           {(adding || loadingFile) ? 'Adding...' : '+ Attach'}
         </button>
         <button
-          onClick={() => window.alert('This is not yet implemented...')}
+          disabled={openingDir}
+          onClick={handleDirOpen}
           className="act-files-btn open-dir"
         >
           🗀 Open directory
@@ -74,7 +91,7 @@ export const FilesRow: React.FC<FilesRowProps> = ({ paper, onAddFile, onRemoveFi
       {filesOpen && fileCount > 0 && (
         <div className="files-list">
           {paper.files.map((f, i) => {
-            const modifyLock = opening[i] || removing[i];
+            const modifyLock = opening.includes(f) || removing.includes(f);
             return (
               <div className="file-item" key={i}>
                 <span className="file-icon">⎙</span>
@@ -84,14 +101,14 @@ export const FilesRow: React.FC<FilesRowProps> = ({ paper, onAddFile, onRemoveFi
                   className="act-file-btn open"
                   onClick={() => handleOpen(i)}
                 >
-                  {(opening) ? 'Opening...' : 'Open'}
+                  Open
                 </button>
                 <button
                   disabled={modifyLock}
                   className="act-file-btn del"
                   onClick={() => handleRemove(i)}
                 >
-                  {(removing) ? 'Removing...' : 'Remove'}
+                  {(removing.includes(f)) ? 'Removing...' : 'Remove'}
                 </button>
               </div>
             )

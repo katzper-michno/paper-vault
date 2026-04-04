@@ -8,6 +8,7 @@ interface VaultPanelProps {
   onDelete: (id: string) => Promise<void>;
   onAddFile: (paperId: string, file: File) => Promise<void>
   onRemoveFile: (paperId: string, name: string) => Promise<void>
+  onOpenFilesDirectory: (paperId: string) => Promise<void>
   onOpenFile: (paperId: string, name: string) => Promise<void>
 }
 
@@ -18,7 +19,8 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
   onDelete,
   onAddFile,
   onRemoveFile,
-  onOpenFile
+  onOpenFile,
+  onOpenFilesDirectory
 }) => {
   const filteredSavedPapers: Paper[] = (savedPapers) ?
     savedPapers.filter(paper =>
@@ -40,6 +42,7 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
             onAddFile={onAddFile}
             onRemoveFile={onRemoveFile}
             onOpenFile={onOpenFile}
+            onOpenFilesDirectory={onOpenFilesDirectory}
           />
         ))}
         {filteredSavedPapers.length === 0 && (

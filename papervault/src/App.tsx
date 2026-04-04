@@ -133,19 +133,16 @@ const App: React.FC = () => {
   }
 
   const handleAddFile = async (paperId: string, file: File): Promise<void> => {
-    console.log(`Adding paper to ${paperId}:`);
-    console.log(file);
-
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await axios.post<string>(
+      const res = await axios.post<{ name: string }>(
         `${SERVER_HOST}/papers/${paperId}/files`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-      const fileName = res.data;
+      const fileName = res.data.name;
 
       setSavedPapers(prev => prev.map((p: Paper) => (p.id === paperId) ?
         {
@@ -159,12 +156,40 @@ const App: React.FC = () => {
     }
   }
 
-  const handleRemoveFile = async (_paperId: string, _fileName: string): Promise<void> => {
-    return;
+  const handleRemoveFile = async (paperId: string, fileName: string): Promise<void> => {
+    try {
+      const encodedName = encodeURIComponent(fileName);
+      await axios.delete(`${SERVER_HOST}/papers/${paperId}/files/${encodedName}`);
+
+      setSavedPapers(prev => prev.map((p: Paper) => (p.id === paperId) ?
+        {
+          ...p,
+          files: p.files.filter(name => name !== fileName)
+        } : p
+      ))
+    } catch (err: any) {
+      console.error('Error removing file:', err);
+      toast.error(`Error removing file: ${err.response?.data.message || err}`);
+    }
   }
 
-  const handleOpenFile = async (_paperId: string, _fileName: string): Promise<void> => {
-    return;
+  const handleOpenFilesDirectory = async (paperId: string): Promise<void> => {
+    try {
+      await axios.get(`${SERVER_HOST}/papers/${paperId}/files/open`);
+    } catch (err: any) {
+      console.error('Error opening files directory:', err);
+      toast.error(`Error opening files directory: ${err.response?.data.message || err}`);
+    }
+  }
+
+  const handleOpenFile = async (paperId: string, fileName: string): Promise<void> => {
+    try {
+      const encodedName = encodeURIComponent(fileName);
+      await axios.get(`${SERVER_HOST}/papers/${paperId}/files/${encodedName}/open`);
+    } catch (err: any) {
+      console.error('Error opening file:', err);
+      toast.error(`Error opening file: ${err.response?.data.message || err}`);
+    }
   }
 
   return (
@@ -224,6 +249,7 @@ const App: React.FC = () => {
             onEdit={handleEdit}
             onAddFile={handleAddFile}
             onRemoveFile={handleRemoveFile}
+            onOpenFilesDirectory={handleOpenFilesDirectory}
             onOpenFile={handleOpenFile}
           />
 

@@ -49,6 +49,10 @@ const addPaper = async (
     return res.status(400).json({ message: 'Paper data with id is required' });
   }
 
+  if (VaultService.paperExists(paper.id)) {
+    return res.status(400).json({ message: `Paper with id ${paper.id} already exists` });
+  }
+
   try {
     VaultService.addPaper(paper);
     res.status(201).json(VaultService.getPaper(paper.id));
@@ -64,6 +68,10 @@ const updatePaper = async (
 ) => {
   const paper = req.body as Paper;
 
+  if (!VaultService.paperExists(paper.id)) {
+    return res.status(404).json({ message: `Paper with id ${paper.id} not found` });
+  }
+
   try {
     VaultService.updatePaper(paper);
     res.status(200).json(VaultService.getPaper(paper.id));
@@ -75,13 +83,17 @@ const updatePaper = async (
 
 const deletePaper = async (
   req: Request<{ id: string }>,
-  res: Response
+  res: Response<{ message: string }>
 ) => {
   const { id } = req.params;
 
+  if (!VaultService.paperExists(id)) {
+    return res.status(404).json({ message: `Paper with id ${id} not found` });
+  }
+
   try {
-    VaultService.removePaper(id);
-    res.status(204);
+    VaultService.deletePaper(id);
+    res.status(204).json({ message: `Paper ${id} deleted successfuly` });
   } catch (error: any) {
     console.log('[Controller] Error when removing paper:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -93,6 +105,10 @@ const generateBibTeX = async (
   res: Response<{ bibtex: string } | { message: string }>
 ) => {
   const { id } = req.params;
+
+  if (!VaultService.paperExists(id)) {
+    return res.status(404).json({ message: `Paper with id ${id} not found` });
+  }
 
   try {
     res.status(200).json({ bibtex: BibTeXService.generate(VaultService.getPaper(id)) });
@@ -113,6 +129,10 @@ const addFile = async (
   const { id } = req.params;
   const file = req.file;
 
+  if (!VaultService.paperExists(id)) {
+    return res.status(404).json({ message: `Paper with id ${id} not found` });
+  }
+
   if (!file) {
     return res.status(400).json({ message: 'No file to add' });
   }
@@ -125,6 +145,65 @@ const addFile = async (
   }
 }
 
+const deleteFile = async (
+  req: Request<{ id: string, name: string }>,
+  res: Response<{ message: string }>
+) => {
+  const { id, name } = req.params;
+  const decodedName = decodeURIComponent(name);
+
+  if (!VaultService.paperExists(id)) {
+    return res.status(404).json({ message: `Paper with id ${id} not found` });
+  }
+
+  try {
+    VaultService.deleteFile(id, decodedName);
+    res.status(204).json({ message: `File ${name} attached to paper ${id} deleted successfuly` });
+  } catch (error: any) {
+    console.log('[Controller] Error when removing file:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+const openFilesDir = async (
+  req: Request<{ id: string }>,
+  res: Response<{ message: string }>
+) => {
+  const { id } = req.params;
+
+  if (!VaultService.paperExists(id)) {
+    return res.status(404).json({ message: `Paper with id ${id} not found` });
+  }
+
+  try {
+    VaultService.openFilesDir(id);
+    res.status(200).json({ message: `Directory of files attached to ${id} opened successfuly` });
+  } catch (error: any) {
+    console.log('[Controller] Error when opening files directory:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+const openFile = async (
+  req: Request<{ id: string, name: string }>,
+  res: Response<{ message: string }>
+) => {
+  const { id, name } = req.params;
+  const decodedName = decodeURIComponent(name);
+
+  if (!VaultService.paperExists(id)) {
+    return res.status(404).json({ message: `Paper with id ${id} not found` });
+  }
+
+  try {
+    VaultService.openFile(id, decodedName);
+    res.status(200).json({ message: `File ${name} attached to paper ${id} opened successfuly` });
+  } catch (error: any) {
+    console.log('[Controller] Error when opening file:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 export const Controller = {
   search,
   getPapers,
@@ -132,5 +211,8 @@ export const Controller = {
   updatePaper,
   deletePaper,
   generateBibTeX,
-  addFile
+  addFile,
+  deleteFile,
+  openFilesDir,
+  openFile
 }

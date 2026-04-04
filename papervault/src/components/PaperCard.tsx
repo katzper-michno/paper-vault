@@ -12,6 +12,7 @@ interface PaperCardProps {
   onDelete: (id: string) => Promise<void>;
   onAddFile: (paperId: string, file: File) => Promise<void>
   onRemoveFile: (paperId: string, name: string) => Promise<void>
+  onOpenFilesDirectory: (paperId: string) => Promise<void>
   onOpenFile: (paperId: string, name: string) => Promise<void>
 }
 
@@ -22,7 +23,8 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   onDelete,
   onAddFile,
   onRemoveFile,
-  onOpenFile
+  onOpenFile,
+  onOpenFilesDirectory
 }) => {
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -114,6 +116,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         paper={paper}
         onAddFile={(file: File) => onAddFile(paper.id, file)}
         onRemoveFile={(name: string) => onRemoveFile(paper.id, name)}
+        onOpenFilesDirectory={() => onOpenFilesDirectory(paper.id)}
         onOpenFile={(name: string) => onOpenFile(paper.id, name)}
       />
     </div>
