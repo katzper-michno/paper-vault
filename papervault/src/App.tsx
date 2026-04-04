@@ -17,7 +17,7 @@ const useTheme = () => {
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
-    document.documentElement.classList.toggle("dark", theme === "dark"); // if using Tailwind
+    document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
   return { theme, setTheme };
@@ -132,6 +132,41 @@ const App: React.FC = () => {
     editingPromise.current = {};
   }
 
+  const handleAddFile = async (paperId: string, file: File): Promise<void> => {
+    console.log(`Adding paper to ${paperId}:`);
+    console.log(file);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await axios.post<string>(
+        `${SERVER_HOST}/papers/${paperId}/files`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      const fileName = res.data;
+
+      setSavedPapers(prev => prev.map((p: Paper) => (p.id === paperId) ?
+        {
+          ...p,
+          files: [...p.files, fileName]
+        } : p
+      ))
+    } catch (err: any) {
+      console.error('Error adding file:', err);
+      toast.error(`Error adding file: ${err.response?.data.message || err}`);
+    }
+  }
+
+  const handleRemoveFile = async (_paperId: string, _fileName: string): Promise<void> => {
+    return;
+  }
+
+  const handleOpenFile = async (_paperId: string, _fileName: string): Promise<void> => {
+    return;
+  }
+
   return (
     <div id="root" className={theme === 'dark' ? 'dark' : ''}>
       <div className="app">
@@ -187,6 +222,9 @@ const App: React.FC = () => {
             filterQuery={libraryQuery.toLowerCase()}
             onDelete={handleRemove}
             onEdit={handleEdit}
+            onAddFile={handleAddFile}
+            onRemoveFile={handleRemoveFile}
+            onOpenFile={handleOpenFile}
           />
 
           {/* Divider */}

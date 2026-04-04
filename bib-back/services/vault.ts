@@ -1,17 +1,19 @@
 import path from "node:path";
 import { Paper } from "../types";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 
-const vault_path = (): string => {
+const vaultPath = (): string => {
   const p = process.env.DB_PATH;
   if (!p) {
     throw Error("Vault path could not be established");
   }
-  return path.join(p, 'db.json');
+  return path.join(p);
 }
 
-const vault = (): Paper[] =>
-  JSON.parse(readFileSync(vault_path(), "utf-8")) as Paper[];
+const vaultMetaPath = (): string => path.join(vaultPath(), 'db.json');
+
+const vaultMeta = (): Paper[] =>
+  JSON.parse(readFileSync(vaultMetaPath(), "utf-8")) as Paper[];
 
 const sanitizeToSave = (paper: Paper): Paper => {
   delete paper.saved;
@@ -20,23 +22,23 @@ const sanitizeToSave = (paper: Paper): Paper => {
 }
 
 const populateWithFiles = (paper: Paper): Paper => {
-  const filesDirPath = path.join(vault_path(), 'files', paper.id);
+  const filesDirPath = path.join(vaultPath(), 'files', paper.id);
   const files = (existsSync(filesDirPath)) ? readdirSync(filesDirPath) : [];
   return { ...paper, files };
 }
 
-const getPapers = (): Paper[] => vault().map(populateWithFiles);
+const getPapers = (): Paper[] => vaultMeta().map(populateWithFiles);
 
 const getPaper = (id: string): Paper => {
-  const paper = vault().find((p: Paper) => p.id === id);
+  const paper = vaultMeta().find((p: Paper) => p.id === id);
   if (!paper) {
     throw new Error(`A paper with id ${id} not found`);
   }
   return populateWithFiles(paper);
 }
 
-const savePapersToDatabase = (papers: Paper[]) => {
-  writeFileSync(vault_path(), JSON.stringify(papers.map(sanitizeToSave), null, 2));
+const savePapers = (papers: Paper[]) => {
+  writeFileSync(vaultMetaPath(), JSON.stringify(papers.map(sanitizeToSave), null, 2));
 }
 
 const addPaper = (paper: Paper) => {
@@ -44,7 +46,7 @@ const addPaper = (paper: Paper) => {
   if (papers.some((p: Paper) => p.id === paper.id)) {
     throw new Error(`A paper with id ${paper.id} already exists`);
   }
-  savePapersToDatabase([...papers, paper]);
+  savePapers([...papers, paper]);
 }
 
 const updatePaper = (paper: Paper) => {
@@ -54,7 +56,7 @@ const updatePaper = (paper: Paper) => {
     throw new Error(`Paper with id ${paper.id} not found`);
   }
   papers[idx] = paper;
-  savePapersToDatabase(papers);
+  savePapers(papers);
 }
 
 const removePaper = (id: string) => {
@@ -62,7 +64,14 @@ const removePaper = (id: string) => {
   if (!papers.some((p: Paper) => p.id === id)) {
     throw new Error(`Paper with id ${id} not found`);
   }
-  savePapersToDatabase(papers.filter((p: Paper) => p.id !== id));
+  savePapers(papers.filter((p: Paper) => p.id !== id));
+}
+
+const addFile = (id: string, file: Express.Multer.File): string => {
+  const dest = path.join(vaultPath(), 'files', id, file.originalname);
+  mkdirSync(path.dirname(dest), { recursive: true });
+  writeFileSync(dest, file.buffer);
+  return file.originalname;
 }
 
 export const VaultService = {
@@ -70,5 +79,6 @@ export const VaultService = {
   getPaper,
   addPaper,
   updatePaper,
-  removePaper
+  removePaper,
+  addFile
 }

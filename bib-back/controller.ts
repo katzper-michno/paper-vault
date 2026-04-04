@@ -102,6 +102,28 @@ const generateBibTeX = async (
   }
 };
 
+interface UploadFileRequest extends Request<{ id: string }> {
+  file?: Express.Multer.File;
+}
+
+const addFile = async (
+  req: UploadFileRequest,
+  res: Response<{ name: string } | { message: string }>
+) => {
+  const { id } = req.params;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ message: 'No file to add' });
+  }
+
+  try {
+    res.status(200).json({ name: VaultService.addFile(id, file) });
+  } catch (error: any) {
+    console.log('[Controller] Error when adding new file:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
 
 export const Controller = {
   search,
@@ -109,5 +131,6 @@ export const Controller = {
   addPaper,
   updatePaper,
   deletePaper,
-  generateBibTeX
+  generateBibTeX,
+  addFile
 }

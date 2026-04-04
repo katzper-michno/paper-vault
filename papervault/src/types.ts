@@ -16,10 +16,6 @@ export interface WebPaper extends EditFormValues {
   saved: boolean;
 }
 
-export interface AttachedFile {
-  name: string;
-}
-
 export interface Paper extends WebPaper {
-  files: AttachedFile[];
+  files: string[];
 }

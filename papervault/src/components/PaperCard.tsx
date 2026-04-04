@@ -3,18 +3,29 @@ import { Paper } from '../types';
 import { ExtLinks, DoiRow, Abstract, HighlightedText } from './PaperMeta';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { FilesRow } from './FilesRow';
 
 interface PaperCardProps {
   paper: Paper;
   filterQuery: string;
   onEdit: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
+  onAddFile: (paperId: string, file: File) => Promise<void>
+  onRemoveFile: (paperId: string, name: string) => Promise<void>
+  onOpenFile: (paperId: string, name: string) => Promise<void>
 }
 
-export const PaperCard: React.FC<PaperCardProps> = ({ paper, filterQuery, onEdit, onDelete }) => {
+export const PaperCard: React.FC<PaperCardProps> = ({
+  paper,
+  filterQuery,
+  onEdit,
+  onDelete,
+  onAddFile,
+  onRemoveFile,
+  onOpenFile
+}) => {
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
 
-  const [filesOpen, setFilesOpen] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
   const [isDeleted, setIsDeleted] = useState<boolean>(false);
   const modifyLock = isEdited || isDeleted;
@@ -22,8 +33,6 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, filterQuery, onEdit
   const [fetchingBibtex, setFetchingBibtex] = useState<boolean>(false);
   const [copiedBibtex, setCopiedBibtex] = useState<boolean>(false);
   const bibtexLock = fetchingBibtex || copiedBibtex;
-
-  const fileCount = paper.files.length;
 
   const handleEdit = async () => {
     setIsEdited(true);
@@ -99,54 +108,14 @@ export const PaperCard: React.FC<PaperCardProps> = ({ paper, filterQuery, onEdit
 
       <DoiRow doi={paper.doi} />
       <ExtLinks arxiv={paper.urls.arxiv} semanticScholar={paper.urls.semanticScholar} />
-
       <Abstract text={paper.abstract} filterQuery={filterQuery} />
 
-      <div className="files-section">
-        <div className="files-row">
-          <button className="files-toggle" onClick={() => setFilesOpen(o => !o)}>
-            <span className={`arrow${filesOpen ? ' open' : ''}`}>›</span>
-            {fileCount > 0
-              ? `${fileCount} attached file${fileCount > 1 ? 's' : ''}`
-              : 'No files'}
-          </button>
-          <button
-            onClick={() => window.alert('Attaching files is not yet implemented...')}
-            className="act-files-btn attach"
-          >
-            + Attach
-          </button>
-          <button
-            onClick={() => window.alert('This is not yet implemented...')}
-            className="act-files-btn open-dir"
-          >
-            🗀 Open directory
-          </button>
-        </div>
-
-        {filesOpen && fileCount > 0 && (
-          <div className="files-list">
-            {paper.files.map((f, i) => (
-              <div className="file-item" key={i}>
-                <span className="file-icon">⎙</span>
-                <span className="file-name">{f.name}</span>
-                <button
-                  className="act-file-btn open"
-                  onClick={() => window.alert('Opening files not yet implemented...')}
-                >
-                  Open
-                </button>
-                <button
-                  className="act-file-btn del"
-                  onClick={() => window.alert('Removing files not yet implemented...')}
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <FilesRow
+        paper={paper}
+        onAddFile={(file: File) => onAddFile(paper.id, file)}
+        onRemoveFile={(name: string) => onRemoveFile(paper.id, name)}
+        onOpenFile={(name: string) => onOpenFile(paper.id, name)}
+      />
     </div>
   );
 };
