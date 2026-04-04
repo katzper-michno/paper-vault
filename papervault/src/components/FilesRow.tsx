@@ -53,14 +53,14 @@ export const FilesRow: React.FC<FilesRowProps> = ({
   const handleDirOpen = async () => {
     setOpeningDir(true);
     await onOpenFilesDirectory();
-    setOpeningDir(false);
+    setTimeout(() => setOpeningDir(false), 1500);
   }
 
   const handleOpen = async (idx: number) => {
     const name = paper.files[idx];
     setOpening(prev => [...prev, name]);
     await onOpenFile(paper.files[idx]);
-    setOpening(prev => prev.filter(n => n !== name));
+    setTimeout(() => setOpening(prev => prev.filter(n => n !== name)), 1500);
   }
 
   return (
@@ -84,7 +84,7 @@ export const FilesRow: React.FC<FilesRowProps> = ({
           onClick={handleDirOpen}
           className="act-files-btn open-dir"
         >
-          🗀 Open directory
+          {(openingDir) ? 'Opening...' : '🗀 Open directory'}
         </button>
       </div>
 
@@ -101,7 +101,7 @@ export const FilesRow: React.FC<FilesRowProps> = ({
                   className="act-file-btn open"
                   onClick={() => handleOpen(i)}
                 >
-                  Open
+                  {(opening.includes(f)) ? 'Opening...' : 'Open'}
                 </button>
                 <button
                   disabled={modifyLock}
