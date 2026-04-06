@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import open from "open";
 
 const vaultPath = (): string => {
-  const p = process.env.DB_PATH;
+  const p = process.env.VAULT_PATH;
   if (!p) {
     throw Error("Vault path could not be established");
   }

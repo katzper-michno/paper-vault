@@ -1,41 +1,47 @@
 import React, { useState } from 'react';
+import { PaperUrls } from '../types';
 
 interface LinkProps {
-  arxiv?: string;
-  semanticScholar?: string;
+  urls: PaperUrls
 }
 
-export const ExtLinks: React.FC<LinkProps> = ({ arxiv, semanticScholar }) => (
+export const ExtLinks: React.FC<LinkProps> = ({ urls }) => (
   <div className="ext-links">
-    {arxiv && (
-      <a
-        className="ext-link arxiv"
-        href={arxiv}
-        target="_blank"
-        rel="noreferrer"
-      >
-        ↗ arXiv
-      </a>
-    )}
-    {semanticScholar && (
-      <a
-        className="ext-link ss"
-        href={semanticScholar}
-        target="_blank"
-        rel="noreferrer"
-      >
-        ↗ Semantic Scholar
-      </a>
-    )}
     {
-      <a
-        className="ext-link ss"
-        href={semanticScholar}
-        target="_blank"
-        rel="noreferrer"
-      >
-        ↗ Sci Hub
-      </a>
+      urls.openAlex && (
+        <a
+          className="ext-link oa"
+          href={urls.openAlex}
+          target="_blank"
+          rel="noreferrer"
+        >
+          ↗ OpenAlex
+        </a>
+      )
+    }
+    {
+      urls.arxiv && (
+        <a
+          className="ext-link arxiv"
+          href={urls.arxiv}
+          target="_blank"
+          rel="noreferrer"
+        >
+          ↗ arXiv
+        </a>
+      )
+    }
+    {
+      urls.sciHub && (
+        <a
+          className="ext-link sh"
+          href={urls.sciHub}
+          target="_blank"
+          rel="noreferrer"
+        >
+          ↗ Sci-Hub
+        </a>
+      )
     }
   </div>
 );

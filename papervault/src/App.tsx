@@ -101,8 +101,9 @@ const App: React.FC = () => {
       year: values.year,
       doi: values.doi,
       urls: {
+        openAlex: values.urls.openAlex,
         arxiv: values.urls.arxiv,
-        semanticScholar: values.urls.semanticScholar
+        sciHub: values.urls.sciHub
       },
       abstract: values.abstract
     }
@@ -201,7 +202,7 @@ const App: React.FC = () => {
             <span className="search-icon">⌕</span>
             <input
               type="text"
-              placeholder="Search your library…"
+              placeholder="Search your vault…"
               value={libraryQuery}
               onChange={e => setLibraryQuery(e.target.value)}
             />

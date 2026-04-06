@@ -18,8 +18,9 @@ const EMPTY_DRAFT: Draft = {
   year: String(CURRENT_YEAR),
   doi: '',
   urls: {
+    openAlex: '',
     arxiv: '',
-    semanticScholar: ''
+    sciHub: ''
   },
   abstract: '',
 }
@@ -71,8 +72,9 @@ export const EditModal: React.FC<EditModalProps> = ({ paper, onClose, onSave }) 
       authors: draft.authors.filter((a) => a.trim() !== ""),
       year: Number(draft.year),
       urls: {
-        semanticScholar: draft.urls.semanticScholar || undefined,
+        openAlex: draft.urls.openAlex || undefined,
         arxiv: draft.urls.arxiv || undefined,
+        sciHub: draft.urls.sciHub || undefined
       },
     };
 
@@ -159,7 +161,16 @@ export const EditModal: React.FC<EditModalProps> = ({ paper, onClose, onSave }) 
           </div>
 
           <div className="mfield">
-            <div className="mlabel">arXiv url</div>
+            <div className="mlabel">OpenAlex</div>
+            <input
+              value={draft.urls.openAlex}
+              onChange={(e) => setUrl('openAlex', e.target.value)}
+              placeholder='openalex.org/works/:oa_id'
+            />
+          </div>
+
+          <div className="mfield">
+            <div className="mlabel">arXiv</div>
             <input
               value={draft.urls.arxiv}
               onChange={(e) => setUrl('arxiv', e.target.value)}
@@ -168,11 +179,11 @@ export const EditModal: React.FC<EditModalProps> = ({ paper, onClose, onSave }) 
           </div>
 
           <div className="mfield">
-            <div className="mlabel">Semantic Scholar</div>
+            <div className="mlabel">Sci-Hub</div>
             <input
-              value={draft.urls.semanticScholar}
-              onChange={(e) => setUrl('semanticScholar', e.target.value)}
-              placeholder='www.semanticscholar.org/paper/:ss_id'
+              value={draft.urls.sciHub}
+              onChange={(e) => setUrl('sciHub', e.target.value)}
+              placeholder='sci-hub.pl/:sh_id'
             />
           </div>
 

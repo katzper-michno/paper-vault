@@ -109,7 +109,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       </div>
 
       <DoiRow doi={paper.doi} />
-      <ExtLinks arxiv={paper.urls.arxiv} semanticScholar={paper.urls.semanticScholar} />
+      <ExtLinks urls={paper.urls} />
       <Abstract text={paper.abstract} filterQuery={filterQuery} />
 
       <FilesRow

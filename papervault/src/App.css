@@ -390,16 +390,22 @@
   color: var(--text0);
 }
 
+.ext-link.oa:hover {
+  background: var(--ss-h-bg);
+  border-color: var(--ss-h-bd);
+  color: var(--ss-h-tx);
+}
+
 .ext-link.arxiv:hover {
   background: var(--orange-bg);
   border-color: var(--orange-bd);
   color: var(--orange-tx);
 }
 
-.ext-link.ss:hover {
-  background: var(--ss-h-bg);
-  border-color: var(--ss-h-bd);
-  color: var(--ss-h-tx);
+.ext-link.sh:hover {
+  background: var(--del-h-bg);
+  border-color: var(--del-h-bd);
+  color: var(--del-h-tx);
 }
 
 /* DOI */

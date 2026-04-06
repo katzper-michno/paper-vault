@@ -1,3 +1,9 @@
+export interface PaperUrls {
+  openAlex?: string;
+  arxiv?: string;
+  sciHub?: string;
+}
+
 export interface EditFormValues {
   title: string;
   authors: string[];
@@ -5,10 +11,7 @@ export interface EditFormValues {
   venue: string;
   year: number;
   doi: string;
-  urls: {
-    semanticScholar?: string;
-    arxiv?: string;
-  }
+  urls: PaperUrls;
 }
 
 export interface WebPaper extends EditFormValues {

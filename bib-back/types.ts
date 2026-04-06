@@ -7,8 +7,10 @@ export interface Paper {
   venue: string;
   doi?: string;
   urls: {
-    semanticScholar?: string;
+    openAlex?: string;
+    semanticScholar?: string; // currently not used
     arxiv?: string;
+    sciHub?: string;
   }
   files?: string[];
   saved?: boolean;

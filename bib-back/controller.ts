@@ -1,8 +1,35 @@
 import { Request, Response } from 'express';
 import { Paper } from "./types";
-import { SemanticScholarClient, SemanticScholarError } from './services/semanticScholar';
 import { VaultService } from './services/vault';
 import { BibTeXService } from './services/bibtex';
+import { ArXivClient } from './services/arxiv';
+import { SciHubClient } from './services/sciHub';
+import { OpenAlexClient } from './services/openAlex';
+
+const printUrlResolutionTable = (papers: Paper[]): void => {
+  const CHECK = "✓";
+  const CROSS = "✗";
+
+  const doiWidth = Math.max(
+    "DOI".length,
+    ...papers.map((p) => p.doi?.length ?? 0)
+  );
+
+  const divider = `+${"-".repeat(doiWidth + 2)}+--------+----------+`;
+  const header = `| ${"DOI".padEnd(doiWidth)} | arXiv  | Sci-Hub  |`;
+
+  console.log(divider);
+  console.log(header);
+  console.log(divider);
+
+  for (const paper of papers) {
+    const arxivCell = (paper.urls.arxiv ? CHECK : CROSS).padStart(3).padEnd(6);
+    const sciHubCell = (paper.urls.sciHub ? CHECK : CROSS).padStart(4).padEnd(8);
+    console.log(`| ${(paper.doi ?? "").padEnd(doiWidth)} | ${arxivCell} | ${sciHubCell} |`);
+  }
+
+  console.log(divider);
+};
 
 const search = async (
   req: Request<{}, {}, {}, { q: string }>,
@@ -15,15 +42,25 @@ const search = async (
   }
 
   try {
-    res.status(200).json(
-      await SemanticScholarClient.searchPapers(q.toLowerCase())
-    );
+    const searchResults = await OpenAlexClient.searchPapers(q.trim().toLowerCase());
+
+    const resultsWithLinks = await Promise.all(searchResults.map(async (paper: Paper) => (
+      {
+        ...paper,
+        urls: {
+          ...paper.urls,
+          arxiv: ArXivClient.generateLink(paper),
+          sciHub: await SciHubClient.generateLink(paper)
+        }
+      })))
+
+    console.log('[Controller] Resolved urls:');
+    printUrlResolutionTable(resultsWithLinks);
+
+    res.status(200).json(resultsWithLinks);
   } catch (error: any) {
-    if (error instanceof SemanticScholarError) {
-      res.status(error.status).json({ message: error.message });
-    } else {
-      res.status(500).json({ message: 'Internal server error' });
-    }
+    console.log('[Controller] Error when searching for papers:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 }
 

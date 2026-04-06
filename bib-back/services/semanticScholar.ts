@@ -72,9 +72,7 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
     venue: paper.venue || 'N/A',
     doi: paper.externalIds?.DOI || undefined,
     urls: {
-      semanticScholar: paper.url || undefined,
-      arxiv: (paper.venue === 'arXiv.org' && paper.externalIds?.DOI) ?
-        `https://doi.org/${paper.externalIds?.DOI}` : undefined
+      semanticScholar: paper.url || undefined
     },
     saved: paper.saved
   }))
