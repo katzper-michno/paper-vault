@@ -1,0 +1,83 @@
+[
+  {
+    "id": "W4403920277",
+    "title": "Factoring through monomial representations: arithmetic characterizations and ambiguity of weighted automata",
+    "authors": [
+      "Antoni Puch",
+      "Daniel Smertnig"
+    ],
+    "abstract": "We characterize group representations that factor through monomial representations, respectively, block-triangular representations with monomial diagonal blocks, by arithmetic properties. Similar results are obtained for semigroup representations by invertible transformations. The characterizations use results on unit equations from Diophantine number theory (by Evertse, van der Poorten, and Schlickewei in characteristic zero, and by Derksen and Masser in positive characteristic). Specialized to finitely generated groups in characteristic zero, one of our main theorems recovers an improvement of a very recent similar characterization by Corvaja, Demeio, Rapinchuk, Ren, and Zannier that was motivated by the study of the bounded generation (BG) property. In positive characteristic, we get a characterization of linear BG groups, recovering a theorem of Abért, Lubotzky, and Pyber from 2003. Our motivation comes from weighted finite automata (WFA) over a field. For invertible WFA we show that $M$-ambiguity, finite ambiguity, and polynomial ambiguity are characterized by arithmetic properties. We discover a full correspondence between arithmetic properties and a complexity hierarchy for WFA based on ambiguity. In the invertible case, this is a far-reaching generalization of a recent result by Bell and the second author, characterizing unambiguous WFA, that resolved a 1979 conjecture of Reutenauer. As a consequence, using the computability of the (linear) Zariski closure of a finitely generated matrix semigroup, the $M$-ambiguity, finite ambiguity, and polynomial ambiguity properties are algorithmically decidable for invertible WFA.",
+    "year": 2024,
+    "venue": "arXiv (Cornell University)",
+    "doi": "10.48550/arxiv.2410.03444",
+    "urls": {
+      "openAlex": "https://openalex.org/W4403920277",
+      "arxiv": "https://doi.org/10.48550/arxiv.2410.03444"
+    }
+  },
+  {
+    "id": "W4289856124",
+    "title": "Transducers of polynomial growth",
+    "authors": [
+      "Mikołaj Bojańczyk"
+    ],
+    "abstract": "The polyregular functions are a class of string-to-string functions that have polynomial size outputs, and which can be defined using finite state models. There are many equivalent definitions of this class, with roots in automata theory, programming languages and logic. This paper surveys recent results on polyregular functions. It presents five of the equivalent definitions, and gives self-contained proofs for most of the equivalences. Decision problems as well as restricted subclasses of the polyregular functions are also discussed.",
+    "year": 2022,
+    "venue": "Proceedings of the 37th Annual ACM/IEEE Symposium on Logic in Computer Science",
+    "doi": "10.1145/3531130.3533326",
+    "urls": {
+      "openAlex": "https://openalex.org/W4289856124"
+    }
+  },
+  {
+    "id": "W1979119667",
+    "title": "Near Unanimity Constraints Have Bounded Pathwidth Duality",
+    "authors": [
+      "Libor Barto",
+      "Marcin Kozik",
+      "Ross Willard"
+    ],
+    "abstract": "We show that if a finite relational structure has a near unanimity polymorphism, then the constraint satisfaction problem with that structure as its fixed template has bounded pathwidth duality, putting the problem in nondeterministic logspace. This generalizes the analogous result of Dalmau and Krokhin for majority polymorphisms and lends further support to a conjecture suggested by Larose and Tesson.",
+    "year": 2012,
+    "venue": "2012 27th Annual IEEE Symposium on Logic in Computer Science",
+    "doi": "10.1109/lics.2012.24",
+    "urls": {
+      "openAlex": "https://openalex.org/W1979119667",
+      "sciHub": "https://sci-hub.pl/10.1109/lics.2012.24"
+    }
+  },
+  {
+    "id": "W2991167089",
+    "title": "On Rich 2-to-1 Games",
+    "authors": [
+      "Mark Braverman",
+      "Subhash Khot",
+      "Dor Minzer"
+    ],
+    "abstract": "We propose a variant of the 2-to-1 Games Conjecture that we call the Rich 2-to-1 Games Conjecture and show that it is equivalent to the Unique Games Conjecture. We are motivated by two considerations. Firstly, in light of the recent proof of the 2-to-1 Games Conjecture [Subhash Khot et al., 2017; Irit Dinur et al., 2018; Irit Dinur et al., 2018; Subhash Khot et al., 2018], we hope to understand how one might make further progress towards a proof of the Unique Games Conjecture. Secondly, the new variant along with perfect completeness in addition, might imply hardness of approximation results that necessarily require perfect completeness and (hence) are not implied by the Unique Games Conjecture.",
+    "year": 2021,
+    "venue": "DROPS (Schloss Dagstuhl – Leibniz Center for Informatics)",
+    "doi": "10.4230/lipics.itcs.2021.27",
+    "urls": {
+      "openAlex": "https://openalex.org/W2991167089"
+    }
+  },
+  {
+    "id": "W4392810066",
+    "title": "Boolean Dimension of a Boolean Lattice",
+    "authors": [
+      "Marcin Briański",
+      "Jędrzej Hodor",
+      "Hoang La",
+      "Piotr Micek",
+      "Katzper Michno"
+    ],
+    "abstract": "For every integer n with n \\geq 6, we prove that the Boolean dimension of a poset consisting of all the subsets of \\{1,\\dots,n\\} equipped with the inclusion relation is strictly less than n. ",
+    "year": 2024,
+    "venue": "Order",
+    "doi": "10.1007/s11083-024-09666-w",
+    "urls": {
+      "openAlex": "https://openalex.org/W4392810066"
+    }
+  }
+]

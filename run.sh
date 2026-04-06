@@ -4,15 +4,15 @@
 set -e
 
 # Ensure directories exist
-if [ ! -d "bib-back" ] || [ ! -d "bib-front" ]; then
-  echo "Error: bib-back or bib-front directory not found."
+if [ ! -d "pv_back" ] || [ ! -d "pv_front" ]; then
+  echo "Error: pv_back or pv_front directory not found."
   exit 1
 fi
 
 echo "Starting backend..."
 
 (
-  cd bib-back
+  cd pv_back
   npm install
   tsc
   node dist/server.js
@@ -23,7 +23,7 @@ BACK_PID=$!
 echo "Starting frontend..."
 
 (
-  cd papervault
+  cd pv_front 
   npm install
   npm run dev
 ) &

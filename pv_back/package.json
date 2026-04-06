@@ -1,7 +1,7 @@
 {
-  "name": "scientific-papers-mock-api",
+  "name": "papervault-back",
   "version": "1.0.0",
-  "description": "Mock API for Scientific Papers Bibliography App",
+  "description": "The backend for papervault",
   "main": "server.js",
   "scripts": {
     "start": "node server.ts",

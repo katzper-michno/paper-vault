@@ -21,7 +21,7 @@ mv bib-front/.env.example bib-front/.env
 #bib-back/.env
 SEMANTIC_SCHOLAR_API_KEY=  #generate your own key or ask someone for theirs:)
 PORT=3001 #you can leave default
-VAULT_PATH=/path/to/this/repository/db-example #provide path to your db, you can use the db-example directory in this repository for testing
+VAULT_PATH=/path/to/this/repository/vault_example #provide path to your db, you can use the db-example directory in this repository for testing
 ```
 
 ```bash
