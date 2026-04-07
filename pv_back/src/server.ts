@@ -24,7 +24,7 @@ app.listen(process.env.BACKEND_PORT, () => {
   console.log(`   DELETE /api/papers/:id`);
   console.log(`   GET    /api/papers/:id/bibtex`);
   console.log(`   POST   /papers/:id/files`);
-  console.log(`   DELETE /papers/:id/files/:name`)
+  console.log(`   DELETE /papers/:id/files/:name`);
   console.log(`   GET /papers/:id/files/open`);
   console.log(`   GET /papers/:id/files/:name/open`);
 });
