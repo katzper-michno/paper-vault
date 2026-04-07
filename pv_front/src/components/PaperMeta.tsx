@@ -1,0 +1,108 @@
+import React, { useState } from 'react';
+import { PaperUrls } from '../types';
+
+interface LinkProps {
+  urls: PaperUrls
+}
+
+export const ExtLinks: React.FC<LinkProps> = ({ urls }) => (
+  <div className="ext-links">
+    {
+      urls.openAlex && (
+        <a
+          className="ext-link oa"
+          href={urls.openAlex}
+          target="_blank"
+          rel="noreferrer"
+        >
+          ↗ OpenAlex
+        </a>
+      )
+    }
+    {
+      urls.arxiv && (
+        <a
+          className="ext-link arxiv"
+          href={urls.arxiv}
+          target="_blank"
+          rel="noreferrer"
+        >
+          ↗ arXiv
+        </a>
+      )
+    }
+    {
+      urls.sciHub && (
+        <a
+          className="ext-link sh"
+          href={urls.sciHub}
+          target="_blank"
+          rel="noreferrer"
+        >
+          ↗ Sci-Hub
+        </a>
+      )
+    }
+  </div>
+);
+
+export const DoiRow: React.FC<{ doi: string }> = ({ doi }) =>
+  <div className="doi-row">
+    <span className="doi-lbl">DOI</span>
+    {doi ?? "N/A"}
+  </div>
+
+export const HighlightedText = ({ text, query }: { text: string, query: string }) => {
+  const regex = new RegExp(`(${query})`, "gi");
+  const parts = text.split(regex);
+
+  const highlightedText = (!query) ? text : (
+    parts.map((part, index) =>
+      regex.test(part) ? (
+        <span key={index} className="highlighted-text">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    ));
+  return <>{highlightedText} </>
+};
+
+export const Abstract: React.FC<{
+  text: string,
+  filterQuery: string
+}> = ({ text, filterQuery }) => {
+  const COLLAPSED_ABSTRACT_CHARACTER_LIMIT = 300;
+  const isAbsCollapsible = text.length > COLLAPSED_ABSTRACT_CHARACTER_LIMIT;
+
+  const [isAbsExpanded, setIsAbsExpanded] = useState<boolean>(false);
+
+  const trimmedText = (text: string, limit: number): string => {
+    if (text.length <= limit) return text;
+
+    const trimmed = text.slice(0, limit);
+    const lastSpaceIndex = trimmed.lastIndexOf(" ");
+
+    const finalText =
+      lastSpaceIndex === -1
+        ? trimmed
+        : trimmed.slice(0, lastSpaceIndex);
+
+    return finalText + "...";
+  }
+
+  const abstractText = (): string => (!isAbsCollapsible || isAbsExpanded) ? text
+    : trimmedText(text, COLLAPSED_ABSTRACT_CHARACTER_LIMIT);
+
+  const toggleExpand = () => setIsAbsExpanded(prev => !prev);
+
+  return <div className="abstract">
+    <HighlightedText text={abstractText()} query={filterQuery} />
+    {(isAbsCollapsible) &&
+      <span onClick={toggleExpand} className="abstract-expand">
+        {(isAbsExpanded) ? "△ Less" : "▽ More"}
+      </span>
+    }
+  </div>
+}
