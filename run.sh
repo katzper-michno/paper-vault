@@ -39,7 +39,7 @@ print_warning() {
 load_config() {
     if [ ! -f "$CONFIG_FILE" ]; then
         print_error "Config file not found at $CONFIG_FILE"
-        print_error "Please create a JSON file with your configuration"
+        print_error "Please run the installation script or create a JSON file with your configuration"
         exit 1
     fi
 

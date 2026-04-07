@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="666.66669"
+   height="533.33331"
+   viewBox="0 0 20.000001 15.999999"
+   fill="none"
+   version="1.1"
+   id="svg2"
+   sodipodi:docname="favicon.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="namedview2"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.97125"
+     inkscape:cx="333.59073"
+     inkscape:cy="297.0399"
+     inkscape:window-width="1920"
+     inkscape:window-height="986"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2" />
+  <path
+     d="m 12,9.5 c 0.8284,0 1.5,-0.6716 1.5,-1.5 0,-0.8284 -0.6716,-1.5 -1.5,-1.5 -0.8284,0 -1.5,0.6716 -1.5,1.5 0,0.8284 0.6716,1.5 1.5,1.5 z"
+     fill="#212121"
+     id="path1"
+     style="fill:#c9211e;fill-opacity:1" />
+  <path
+     d="M 0,3.75 C 0,1.67893 1.67893,0 3.75,0 h 12.5 C 18.3211,0 20,1.67893 20,3.75 v 8.5 C 20,14.3211 18.3211,16 16.25,16 H 3.75 C 1.67893,16 0,14.3211 0,12.25 Z M 3.75,3 C 3.33579,3 3,3.33579 3,3.75 v 8.5 C 3,12.6642 3.33579,13 3.75,13 4.16421,13 4.5,12.6642 4.5,12.25 V 3.75 C 4.5,3.33579 4.16421,3 3.75,3 Z m 5.5303,1.21967 c -0.2929,-0.29289 -0.7677,-0.29289 -1.0606,0 -0.29292,0.29289 -0.29292,0.76777 0,1.06066 L 9.4154,6.476 C 9.1514,6.9227 9,7.4436 9,8 9,8.5564 9.1514,9.0773 9.4154,9.524 l -1.1957,1.1957 c -0.29292,0.2929 -0.29292,0.7677 0,1.0606 0.2929,0.2929 0.7677,0.2929 1.0606,0 L 10.476,10.5846 C 10.9227,10.8486 11.4436,11 12,11 c 0.5564,0 1.0773,-0.1514 1.524,-0.4154 l 1.1957,1.1957 c 0.2929,0.2929 0.7677,0.2929 1.0606,0 0.2929,-0.2929 0.2929,-0.7677 0,-1.0606 L 14.5846,9.524 C 14.8486,9.0773 15,8.5564 15,8 15,7.4436 14.8486,6.9227 14.5846,6.476 l 1.1957,-1.19567 c 0.2929,-0.29289 0.2929,-0.76777 0,-1.06066 -0.2929,-0.29289 -0.7677,-0.29289 -1.0606,0 L 13.524,5.41536 C 13.0773,5.15145 12.5564,5 12,5 11.4436,5 10.9227,5.15145 10.476,5.41536 Z"
+     fill="#212121"
+     id="path2"
+     style="fill:#c9211e;fill-opacity:1" />
+</svg>

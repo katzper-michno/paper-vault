@@ -38,7 +38,7 @@ export const WebResultCard: React.FC<WebResultCardProps> = ({ paper, isSaved, on
         className={`save-btn${saveLock ? ' saved' : ''}`}
         onClick={handleSave}
       >
-        {isSaved ? '✓ Saved' : isBeingSaved ? 'Saving...' : '+ Save to library'}
+        {isSaved ? '✓ Saved' : isBeingSaved ? 'Saving...' : '+ Save to vault'}
       </button>
     </div>
   );
