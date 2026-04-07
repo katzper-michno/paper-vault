@@ -30,6 +30,24 @@
     }
   },
   {
+    "id": "W4392810066",
+    "title": "Boolean Dimension of a Boolean Lattice",
+    "authors": [
+      "Marcin Briański",
+      "Jędrzej Hodor",
+      "Hoang La",
+      "Piotr Micek",
+      "Katzper Michno"
+    ],
+    "abstract": "For every integer n with n \\geq 6, we prove that the Boolean dimension of a poset consisting of all the subsets of \\{1,\\dots,n\\} equipped with the inclusion relation is strictly less than n. ",
+    "year": 2024,
+    "venue": "Order",
+    "doi": "10.1007/s11083-024-09666-w",
+    "urls": {
+      "openAlex": "https://openalex.org/W4392810066"
+    }
+  },
+  {
     "id": "W1979119667",
     "title": "Near Unanimity Constraints Have Bounded Pathwidth Duality",
     "authors": [
@@ -60,24 +78,6 @@
     "doi": "10.4230/lipics.itcs.2021.27",
     "urls": {
       "openAlex": "https://openalex.org/W2991167089"
-    }
-  },
-  {
-    "id": "W4392810066",
-    "title": "Boolean Dimension of a Boolean Lattice",
-    "authors": [
-      "Marcin Briański",
-      "Jędrzej Hodor",
-      "Hoang La",
-      "Piotr Micek",
-      "Katzper Michno"
-    ],
-    "abstract": "For every integer n with n \\geq 6, we prove that the Boolean dimension of a poset consisting of all the subsets of \\{1,\\dots,n\\} equipped with the inclusion relation is strictly less than n. ",
-    "year": 2024,
-    "venue": "Order",
-    "doi": "10.1007/s11083-024-09666-w",
-    "urls": {
-      "openAlex": "https://openalex.org/W4392810066"
     }
   }
 ]

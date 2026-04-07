@@ -11,7 +11,7 @@ const vaultPath = (): string => {
   return path.join(p);
 }
 
-const vaultMetaPath = (): string => path.join(vaultPath(), 'db.json');
+const vaultMetaPath = (): string => path.join(vaultPath(), 'vault.json');
 
 const vaultMeta = (): Paper[] =>
   JSON.parse(readFileSync(vaultMetaPath(), "utf-8")) as Paper[];
