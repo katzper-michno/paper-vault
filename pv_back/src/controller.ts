@@ -208,11 +208,9 @@ const deleteFile = async (
 
   try {
     VaultService.deleteFile(id, decodedName);
-    res
-      .status(204)
-      .json({
-        message: `File ${name} attached to paper ${id} deleted successfuly`,
-      });
+    res.status(204).json({
+      message: `File ${name} attached to paper ${id} deleted successfuly`,
+    });
   } catch (error: any) {
     console.log("[Controller] Error when removing file:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -231,11 +229,9 @@ const openFilesDir = async (
 
   try {
     VaultService.openFilesDir(id);
-    res
-      .status(200)
-      .json({
-        message: `Directory of files attached to ${id} opened successfuly`,
-      });
+    res.status(200).json({
+      message: `Directory of files attached to ${id} opened successfuly`,
+    });
   } catch (error: any) {
     console.log("[Controller] Error when opening files directory:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -255,11 +251,9 @@ const openFile = async (
 
   try {
     VaultService.openFile(id, decodedName);
-    res
-      .status(200)
-      .json({
-        message: `File ${name} attached to paper ${id} opened successfuly`,
-      });
+    res.status(200).json({
+      message: `File ${name} attached to paper ${id} opened successfuly`,
+    });
   } catch (error: any) {
     console.log("[Controller] Error when opening file:", error);
     res.status(500).json({ message: "Internal server error" });
