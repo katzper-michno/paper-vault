@@ -21,9 +21,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: './pv_back/.nvmrc'
           cache: npm
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: './pv_back/package-lock.json'
 
       - name: Install dependencies
         run: npm ci
@@ -48,9 +48,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: './pv_front/.nvmrc'
           cache: npm
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: './pv_front/package-lock.json'
 
       - name: Install dependencies
         run: npm ci
