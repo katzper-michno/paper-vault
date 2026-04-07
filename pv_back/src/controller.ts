@@ -6,6 +6,10 @@ import { ArXivClient } from "./services/arxiv";
 import { SciHubClient } from "./services/sciHub";
 import { OpenAlexClient } from "./services/openAlex";
 
+const healthcheck = async (req: Request, res: Response) => {
+  res.status(200).json({ message: "PaperVault service is OK:)" });
+};
+
 const printUrlResolutionTable = (papers: Paper[]): void => {
   const CHECK = "✓";
   const CROSS = "✗";
@@ -261,6 +265,7 @@ const openFile = async (
 };
 
 export const Controller = {
+  healthcheck,
   search,
   getPapers,
   addPaper,

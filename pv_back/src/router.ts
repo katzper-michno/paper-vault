@@ -6,6 +6,9 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 export const router = Router();
 
+// Healthcheck
+router.get("/healthcheck", Controller.healthcheck);
+
 // Search for papers in the web
 router.get("/search", Controller.search);
 

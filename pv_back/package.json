@@ -4,8 +4,8 @@
   "description": "The backend for papervault",
   "main": "server.js",
   "scripts": {
-    "start": "node server.ts",
-    "dev": "nodemon server.ts",
+    "start": "node src/server.ts",
+    "dev": "nodemon src/server.ts",
     "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json,md}\"",
     "compile": "tsc",
