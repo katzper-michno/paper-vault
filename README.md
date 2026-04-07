@@ -2,13 +2,13 @@
 
 <p align="center">
   <img 
-    style="width: 60%;"
+    style="width: 40%;"
     src="assets/banner.svg"/>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/v/release/katzper-michno/paper-vault?style=flat-square&label=latest release&color=green" alt="release" />
-  <img src="https://img.shields.io/github/license/katzper-michno/paper-vault?style=flat-square&color=orange" alt="license" />
+  <img alt="GitHub Release" src="https://img.shields.io/github/v/release/katzper-michno/paper-vault?style=flat-square&label=latest%20release&color=purple">
+  <img alt="GitHub License" src="https://img.shields.io/github/license/katzper-michno/paper-vault?style=flat-square&color=red"/>
 </p>
 
 <p align="center"><b>A local database of research papers integrated with <a href="https://arxiv.org/">arXiv</a>, <a href="https://openalex.org/">OpenAlex</a> and <a href="https://sci-hub.pl/">Sci-Hub</a></b></p>
