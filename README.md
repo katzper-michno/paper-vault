@@ -2,6 +2,19 @@
 
 ![Teaser](teaser.png)
 
+## Dependencies
+
+```
+# macOS
+brew install jq
+
+# Ubuntu/Debian
+sudo apt-get install jq
+
+# Arch
+sudo pacman -Sy jq
+```
+
 ## How to use 
 
 1. Clone the repository
