@@ -116,9 +116,6 @@ prepare_run_script() {
 main() {
     print_status "Starting PaperVault installation..."
     
-    # Check if running with sudo
-    check_sudo
-    
     # Get the directory where install.sh is located
     local script_dir=$(get_script_dir)
     print_status "Installation script located at: $script_dir"
@@ -142,6 +139,7 @@ main() {
     
     # Move prepared run script to install directory
     print_status "Installing run script to $INSTALL_DIR/$SCRIPT_NAME"
+    mkdir -p "$INSTALL_DIR"
     cp "$temp_run_script" "$INSTALL_DIR/$SCRIPT_NAME"
     
     # Make executable
