@@ -11,7 +11,7 @@ export interface Paper {
     semanticScholar?: string; // currently not used
     arxiv?: string;
     sciHub?: string;
-  }
+  };
   files?: string[];
   saved?: boolean;
 }

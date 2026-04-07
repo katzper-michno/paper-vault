@@ -3,9 +3,9 @@
   --bg0: #ffffff;
   --bg1: #f5f5f3;
   --bg2: #e8e8e6;
-  --border0: rgba(0, 0, 0, 0.10);
+  --border0: rgba(0, 0, 0, 0.1);
   --border1: rgba(0, 0, 0, 0.18);
-  --border2: rgba(0, 0, 0, 0.30);
+  --border2: rgba(0, 0, 0, 0.3);
   --text0: #1a1a18;
   --text1: #555552;
   --text2: #8a8a87;
@@ -685,7 +685,11 @@
   color: var(--text1);
   cursor: pointer;
   margin-top: 8px;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    transform 0.1s;
 }
 
 .save-btn:hover:not(:disabled) {
@@ -817,7 +821,11 @@
   background: var(--bg0);
   color: var(--text1);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    transform 0.1s;
 }
 
 .mbtn-add-author:hover {

@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-backend:
+    name: Backend (pv_back)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pv_back
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 25
+          cache: npm
+          cache-dependency-path: pv_back/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript compilation
+        run: npm run compile:check
+
+      - name: Prettier check
+        run: npm run format:check 
+
+  check-frontend:
+    name: Frontend (pv_front)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pv_front
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 25
+          cache: npm
+          cache-dependency-path: pv_front/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build check 
+        run: npm run build
+
+      - name: Prettier check
+        run: npm run format:check

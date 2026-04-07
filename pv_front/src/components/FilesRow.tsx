@@ -1,14 +1,14 @@
-import { useState } from "react"
-import { Paper } from "../types"
-import { useFilePicker } from "use-file-picker"
-import { SelectedFiles } from "use-file-picker/types"
+import { useState } from 'react';
+import { Paper } from '../types';
+import { useFilePicker } from 'use-file-picker';
+import { SelectedFiles } from 'use-file-picker/types';
 
 interface FilesRowProps {
-  paper: Paper,
-  onAddFile: (file: File) => Promise<void>
-  onRemoveFile: (name: string) => Promise<void>
-  onOpenFilesDirectory: () => Promise<void>
-  onOpenFile: (name: string) => Promise<void>
+  paper: Paper;
+  onAddFile: (file: File) => Promise<void>;
+  onRemoveFile: (name: string) => Promise<void>;
+  onOpenFilesDirectory: () => Promise<void>;
+  onOpenFile: (name: string) => Promise<void>;
 }
 
 export const FilesRow: React.FC<FilesRowProps> = ({
@@ -16,7 +16,7 @@ export const FilesRow: React.FC<FilesRowProps> = ({
   onAddFile,
   onRemoveFile,
   onOpenFile,
-  onOpenFilesDirectory
+  onOpenFilesDirectory,
 }) => {
   const [filesOpen, setFilesOpen] = useState<boolean>(false);
 
@@ -38,53 +38,47 @@ export const FilesRow: React.FC<FilesRowProps> = ({
           setAdding(false);
         }
       }
-    }
+    },
   });
 
   const handleAdd = openFilePicker;
 
   const handleRemove = async (idx: number) => {
     const name = paper.files[idx];
-    setRemoving(prev => [...prev, name]);
+    setRemoving((prev) => [...prev, name]);
     await onRemoveFile(paper.files[idx]);
-    setRemoving(prev => prev.filter(n => n !== name))
-  }
+    setRemoving((prev) => prev.filter((n) => n !== name));
+  };
 
   const handleDirOpen = async () => {
     setOpeningDir(true);
     await onOpenFilesDirectory();
     setTimeout(() => setOpeningDir(false), 1500);
-  }
+  };
 
   const handleOpen = async (idx: number) => {
     const name = paper.files[idx];
-    setOpening(prev => [...prev, name]);
+    setOpening((prev) => [...prev, name]);
     await onOpenFile(paper.files[idx]);
-    setTimeout(() => setOpening(prev => prev.filter(n => n !== name)), 1500);
-  }
+    setTimeout(() => setOpening((prev) => prev.filter((n) => n !== name)), 1500);
+  };
 
   return (
     <div className="files-section">
       <div className="files-row">
-        <button className="files-toggle" onClick={() => setFilesOpen(o => !o)}>
+        <button className="files-toggle" onClick={() => setFilesOpen((o) => !o)}>
           <span className={`arrow${filesOpen ? ' open' : ''}`}>›</span>
-          {fileCount > 0
-            ? `${fileCount} attached file${fileCount > 1 ? 's' : ''}`
-            : 'No files'}
+          {fileCount > 0 ? `${fileCount} attached file${fileCount > 1 ? 's' : ''}` : 'No files'}
         </button>
         <button
           disabled={adding || loadingFile}
           onClick={handleAdd}
           className="act-files-btn attach"
         >
-          {(adding || loadingFile) ? 'Adding...' : '+ Attach'}
+          {adding || loadingFile ? 'Adding...' : '+ Attach'}
         </button>
-        <button
-          disabled={openingDir}
-          onClick={handleDirOpen}
-          className="act-files-btn open-dir"
-        >
-          {(openingDir) ? 'Opening...' : '🗀 Open directory'}
+        <button disabled={openingDir} onClick={handleDirOpen} className="act-files-btn open-dir">
+          {openingDir ? 'Opening...' : '🗀 Open directory'}
         </button>
       </div>
 
@@ -101,20 +95,20 @@ export const FilesRow: React.FC<FilesRowProps> = ({
                   className="act-file-btn open"
                   onClick={() => handleOpen(i)}
                 >
-                  {(opening.includes(f)) ? 'Opening...' : 'Open'}
+                  {opening.includes(f) ? 'Opening...' : 'Open'}
                 </button>
                 <button
                   disabled={modifyLock}
                   className="act-file-btn del"
                   onClick={() => handleRemove(i)}
                 >
-                  {(removing.includes(f)) ? 'Removing...' : 'Remove'}
+                  {removing.includes(f) ? 'Removing...' : 'Remove'}
                 </button>
               </div>
-            )
+            );
           })}
         </div>
       )}
     </div>
   );
-}
+};

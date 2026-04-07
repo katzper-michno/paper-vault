@@ -1,4 +1,4 @@
-import { Paper } from '../types';
+import { Paper } from "../types";
 import axios from "axios";
 
 interface OpenAlexWork {
@@ -18,12 +18,14 @@ interface OpenAlexWork {
 
 interface OpenAlexResponse {
   meta: {
-    count: number,
-  }
+    count: number;
+  };
   results: OpenAlexWork[];
 }
 
-function reconstructAbstract(invertedIndex: Record<string, number[]> | null): string {
+function reconstructAbstract(
+  invertedIndex: Record<string, number[]> | null,
+): string {
   if (!invertedIndex) return "";
 
   const words: string[] = [];
@@ -39,31 +41,34 @@ function reconstructAbstract(invertedIndex: Record<string, number[]> | null): st
 export async function searchPapers(query: string): Promise<Paper[]> {
   const API_KEY = process.env.OPEN_ALEX_API_KEY;
 
-  const url = 'https://api.openalex.org/works?'
-    + `search=${encodeURIComponent(query)}`
-    + '&per-page=10'
-    + ((API_KEY) ? `&api_key=${API_KEY}` : '');
+  const url =
+    "https://api.openalex.org/works?" +
+    `search=${encodeURIComponent(query)}` +
+    "&per-page=10" +
+    (API_KEY ? `&api_key=${API_KEY}` : "");
 
   console.log(`[OpenAlexClient] Sending request with URL: ${url}`);
 
   const response = await axios.get<OpenAlexResponse>(url, {
-    timeout: 20000
+    timeout: 20000,
   });
 
   console.log(`[OpenAlexClient] Obtained ${response.data.meta.count} results`);
 
   return response.data.results.map((work: OpenAlexWork) => {
+    const venue =
+      work.primary_location?.source?.display_name ??
+      work.primary_location?.raw_source_name ??
+      "";
 
-    const venue = work.primary_location?.source?.display_name ??
-      work.primary_location?.raw_source_name ?? "";
-
-    const doi = (work.doi) ? (
-      (work.doi.startsWith('https://doi.org/')) ?
-        work.doi.slice('https://doi.org/'.length) : work.doi
-    ) : undefined;
+    const doi = work.doi
+      ? work.doi.startsWith("https://doi.org/")
+        ? work.doi.slice("https://doi.org/".length)
+        : work.doi
+      : undefined;
 
     return {
-      id: work.id.split('/').reverse()[0],
+      id: work.id.split("/").reverse()[0],
       title: work.title,
       authors: work.authorships.map((a) => a.author.display_name),
       abstract: reconstructAbstract(work.abstract_inverted_index),
@@ -73,10 +78,10 @@ export async function searchPapers(query: string): Promise<Paper[]> {
       urls: {
         openAlex: work.id,
       },
-    }
+    };
   });
 }
 
 export const OpenAlexClient = {
-  searchPapers
-}
+  searchPapers,
+};
