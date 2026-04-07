@@ -9,19 +9,19 @@ import axios from 'axios';
 import { VaultPanel } from './components/VaultPanel.tsx';
 
 const useTheme = () => {
-  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
-  const [theme, setTheme] = useState<"light" | "dark">(
-    () => (localStorage.getItem("theme") as "light" | "dark") ?? systemTheme
+  const [theme, setTheme] = useState<'light' | 'dark'>(
+    () => (localStorage.getItem('theme') as 'light' | 'dark') ?? systemTheme
   );
 
   useEffect(() => {
-    localStorage.setItem("theme", theme);
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem('theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
   return { theme, setTheme };
-}
+};
 
 const App: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -32,7 +32,7 @@ const App: React.FC = () => {
   const [panelOpen, setPanelOpen] = useState(false);
 
   const [editingPaper, setEditingPaper] = useState<Paper | null>(null);
-  const editingPromise = useRef<{ promise?: Promise<void>, resolve?: () => void }>({})
+  const editingPromise = useRef<{ promise?: Promise<void>; resolve?: () => void }>({});
 
   const [libraryQuery, setLibraryQuery] = useState('');
 
@@ -42,7 +42,7 @@ const App: React.FC = () => {
   const savedIds: Set<string> = new Set(savedPapers.map((p: Paper) => p.id));
 
   useEffect(() => {
-    fetchSavedPapers()
+    fetchSavedPapers();
   }, []);
 
   const fetchSavedPapers = async (): Promise<void> => {
@@ -53,7 +53,7 @@ const App: React.FC = () => {
       setSavedPapers(res.data);
     } catch (err: any) {
       console.error('Error fetching papers from the vault:', err);
-      toast.error(`Error fetching papers from the vault ${err.response?.data.message || err}`)
+      toast.error(`Error fetching papers from the vault ${err.response?.data.message || err}`);
     } finally {
       setLoading(false);
     }
@@ -62,17 +62,17 @@ const App: React.FC = () => {
   const handleRemove = async (id: string): Promise<void> => {
     try {
       await axios.delete(`${SERVER_HOST}/papers/${id}`);
-      setSavedPapers(prev => prev.filter(p => p.id !== id));
+      setSavedPapers((prev) => prev.filter((p) => p.id !== id));
     } catch (err: any) {
       console.error('Error deleting paper:', err);
-      toast.error(`Error deleting paper ${err.response?.data.message || err}`)
+      toast.error(`Error deleting paper ${err.response?.data.message || err}`);
     }
   };
 
   const handleSave = async (paper: WebPaper): Promise<void> => {
     try {
       const res = await axios.post<Paper>(`${SERVER_HOST}/papers`, paper);
-      setSavedPapers(prev => [res.data, ...prev]);
+      setSavedPapers((prev) => [res.data, ...prev]);
     } catch (err: any) {
       console.error('Error saving paper:', err);
       toast.error(`Error saving paper: ${err.response?.data.message || err}`);
@@ -80,8 +80,8 @@ const App: React.FC = () => {
   };
 
   const handleEdit = async (paperId: string): Promise<void> => {
-    const paperToEdit = savedPapers.filter(p => p.id === paperId)[0];
-    const deferred: { promise?: Promise<void>, resolve?: () => void } = {};
+    const paperToEdit = savedPapers.filter((p) => p.id === paperId)[0];
+    const deferred: { promise?: Promise<void>; resolve?: () => void } = {};
     deferred.promise = new Promise((res, _) => {
       deferred.resolve = res;
     });
@@ -103,23 +103,18 @@ const App: React.FC = () => {
       urls: {
         openAlex: values.urls.openAlex,
         arxiv: values.urls.arxiv,
-        sciHub: values.urls.sciHub
+        sciHub: values.urls.sciHub,
       },
-      abstract: values.abstract
-    }
+      abstract: values.abstract,
+    };
 
     try {
       await axios.put(`${SERVER_HOST}/papers/${id}`, paper);
 
-      setSavedPapers(prev =>
-        prev.map((p: Paper): Paper =>
-          p.id === id
-            ? paper : p
-        )
-      );
+      setSavedPapers((prev) => prev.map((p: Paper): Paper => (p.id === id ? paper : p)));
     } catch (err: any) {
       console.error('Error deleting paper:', err);
-      toast.error(`Error deleting paper ${err.response.data.message}`)
+      toast.error(`Error deleting paper ${err.response.data.message}`);
     } finally {
       setEditingPaper(null);
       editingPromise.current.resolve!();
@@ -131,48 +126,56 @@ const App: React.FC = () => {
     setEditingPaper(null);
     editingPromise.current.resolve!();
     editingPromise.current = {};
-  }
+  };
 
   const handleAddFile = async (paperId: string, file: File): Promise<void> => {
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append('file', file);
 
       const res = await axios.post<{ name: string }>(
         `${SERVER_HOST}/papers/${paperId}/files`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       const fileName = res.data.name;
 
-      setSavedPapers(prev => prev.map((p: Paper) => (p.id === paperId) ?
-        {
-          ...p,
-          files: [...p.files, fileName]
-        } : p
-      ))
+      setSavedPapers((prev) =>
+        prev.map((p: Paper) =>
+          p.id === paperId
+            ? {
+                ...p,
+                files: [...p.files, fileName],
+              }
+            : p
+        )
+      );
     } catch (err: any) {
       console.error('Error adding file:', err);
       toast.error(`Error adding file: ${err.response?.data.message || err}`);
     }
-  }
+  };
 
   const handleRemoveFile = async (paperId: string, fileName: string): Promise<void> => {
     try {
       const encodedName = encodeURIComponent(fileName);
       await axios.delete(`${SERVER_HOST}/papers/${paperId}/files/${encodedName}`);
 
-      setSavedPapers(prev => prev.map((p: Paper) => (p.id === paperId) ?
-        {
-          ...p,
-          files: p.files.filter(name => name !== fileName)
-        } : p
-      ))
+      setSavedPapers((prev) =>
+        prev.map((p: Paper) =>
+          p.id === paperId
+            ? {
+                ...p,
+                files: p.files.filter((name) => name !== fileName),
+              }
+            : p
+        )
+      );
     } catch (err: any) {
       console.error('Error removing file:', err);
       toast.error(`Error removing file: ${err.response?.data.message || err}`);
     }
-  }
+  };
 
   const handleOpenFilesDirectory = async (paperId: string): Promise<void> => {
     try {
@@ -181,7 +184,7 @@ const App: React.FC = () => {
       console.error('Error opening files directory:', err);
       toast.error(`Error opening files directory: ${err.response?.data.message || err}`);
     }
-  }
+  };
 
   const handleOpenFile = async (paperId: string, fileName: string): Promise<void> => {
     try {
@@ -191,7 +194,7 @@ const App: React.FC = () => {
       console.error('Error opening file:', err);
       toast.error(`Error opening file: ${err.response?.data.message || err}`);
     }
-  }
+  };
 
   return (
     <div id="root" className={theme === 'dark' ? 'dark' : ''}>
@@ -204,38 +207,43 @@ const App: React.FC = () => {
               type="text"
               placeholder="Search your vault…"
               value={libraryQuery}
-              onChange={e => setLibraryQuery(e.target.value)}
+              onChange={(e) => setLibraryQuery(e.target.value)}
             />
           </div>
 
           <div className="topbar-right">
             <button
               className="icon-btn"
-              onClick={() => window.alert('Here, you will be able to manage your vault repository (push, pull, commit).')}
+              onClick={() =>
+                window.alert(
+                  'Here, you will be able to manage your vault repository (push, pull, commit).'
+                )
+              }
             >
               ⎇
             </button>
             <button
               className="icon-btn"
-              onClick={() => window.alert('Here, you will be able to modify environment variables.')}
+              onClick={() =>
+                window.alert('Here, you will be able to modify environment variables.')
+              }
             >
               ⚙︎
             </button>
-            <button
-              className="icon-btn"
-              onClick={toggleTheme}
-              title="Toggle light/dark mode"
-            >
+            <button className="icon-btn" onClick={toggleTheme} title="Toggle light/dark mode">
               {theme === 'dark' ? '☽' : '☀'}
             </button>
             <button
               disabled={loading}
               className={`web-toggle${panelOpen ? ' active' : ''}`}
-              onClick={() => setPanelOpen(o => !o)}
+              onClick={() => setPanelOpen((o) => !o)}
             >
               <span className="dot" />
               <span>{panelOpen ? 'Hide web search' : 'Web search'}</span>
-              <span className="toggle-arrow" style={{ transform: panelOpen ? 'rotate(180deg)' : '' }}>
+              <span
+                className="toggle-arrow"
+                style={{ transform: panelOpen ? 'rotate(180deg)' : '' }}
+              >
                 ›
               </span>
             </button>
@@ -257,19 +265,11 @@ const App: React.FC = () => {
           {/* Divider */}
           <div className={`divider${panelOpen ? ' visible' : ''}`} />
 
-          <WebSearchPanel
-            isOpen={!loading && panelOpen}
-            savedIds={savedIds}
-            onSave={handleSave}
-          />
+          <WebSearchPanel isOpen={!loading && panelOpen} savedIds={savedIds} onSave={handleSave} />
         </div>
       </div>
 
-      <EditModal
-        paper={editingPaper}
-        onClose={handleCloseModal}
-        onSave={handleSaveEdit}
-      />
+      <EditModal paper={editingPaper} onClose={handleCloseModal} onSave={handleSaveEdit} />
 
       <ToastContainer
         position="bottom-left"

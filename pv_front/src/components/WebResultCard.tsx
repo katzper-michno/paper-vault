@@ -31,17 +31,15 @@ export const WebResultCard: React.FC<WebResultCardProps> = ({ paper, isSaved, on
 
       <DoiRow doi={paper.doi} />
       <ExtLinks urls={paper.urls} />
-      <Abstract text={paper.abstract} filterQuery='' />
+      <Abstract text={paper.abstract} filterQuery="" />
 
       <button
         disabled={saveLock}
         className={`save-btn${saveLock ? ' saved' : ''}`}
         onClick={handleSave}
       >
-        {isSaved ? '✓ Saved' :
-          (isBeingSaved ? 'Saving...' : '+ Save to library')
-        }
+        {isSaved ? '✓ Saved' : isBeingSaved ? 'Saving...' : '+ Save to library'}
       </button>
     </div>
   );
-}
+};

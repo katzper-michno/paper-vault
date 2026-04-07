@@ -10,10 +10,10 @@ interface PaperCardProps {
   filterQuery: string;
   onEdit: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  onAddFile: (paperId: string, file: File) => Promise<void>
-  onRemoveFile: (paperId: string, name: string) => Promise<void>
-  onOpenFilesDirectory: (paperId: string) => Promise<void>
-  onOpenFile: (paperId: string, name: string) => Promise<void>
+  onAddFile: (paperId: string, file: File) => Promise<void>;
+  onRemoveFile: (paperId: string, name: string) => Promise<void>;
+  onOpenFilesDirectory: (paperId: string) => Promise<void>;
+  onOpenFile: (paperId: string, name: string) => Promise<void>;
 }
 
 export const PaperCard: React.FC<PaperCardProps> = ({
@@ -24,7 +24,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   onAddFile,
   onRemoveFile,
   onOpenFile,
-  onOpenFilesDirectory
+  onOpenFilesDirectory,
 }) => {
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -62,7 +62,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
     } finally {
       setTimeout(() => setFetchingBibtex(false), 500);
     }
-  }
+  };
 
   return (
     <div className="paper-card">
@@ -76,29 +76,14 @@ export const PaperCard: React.FC<PaperCardProps> = ({
           </div>
         </div>
         <div className="card-actions">
-          <button
-            disabled={bibtexLock}
-            onClick={handleCopyBibtex}
-            className="act-btn bibtex"
-          >
-            {
-              (fetchingBibtex) ? 'Generating...' : (
-                (copiedBibtex) ? '✓ Copied' : '✎ Copy BibTeX'
-              )
-            }
+          <button disabled={bibtexLock} onClick={handleCopyBibtex} className="act-btn bibtex">
+            {fetchingBibtex ? 'Generating...' : copiedBibtex ? '✓ Copied' : '✎ Copy BibTeX'}
           </button>
-          <button
-            className="act-btn"
-            onClick={handleEdit}
-          >
-            {(isEdited) ? 'Editing...' : 'Edit'}
+          <button className="act-btn" onClick={handleEdit}>
+            {isEdited ? 'Editing...' : 'Edit'}
           </button>
-          <button
-            disabled={modifyLock}
-            className="act-btn del"
-            onClick={handleDelete}
-          >
-            {(isDeleted) ? 'Removing...' : 'Remove'}
+          <button disabled={modifyLock} className="act-btn del" onClick={handleDelete}>
+            {isDeleted ? 'Removing...' : 'Remove'}
           </button>
         </div>
       </div>

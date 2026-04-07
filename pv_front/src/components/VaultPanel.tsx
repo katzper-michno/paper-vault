@@ -1,15 +1,15 @@
-import { Paper } from "../types";
-import { PaperCard } from "./PaperCard";
+import { Paper } from '../types';
+import { PaperCard } from './PaperCard';
 
 interface VaultPanelProps {
   savedPapers?: undefined | Paper[];
   filterQuery: string;
   onEdit: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  onAddFile: (paperId: string, file: File) => Promise<void>
-  onRemoveFile: (paperId: string, name: string) => Promise<void>
-  onOpenFilesDirectory: (paperId: string) => Promise<void>
-  onOpenFile: (paperId: string, name: string) => Promise<void>
+  onAddFile: (paperId: string, file: File) => Promise<void>;
+  onRemoveFile: (paperId: string, name: string) => Promise<void>;
+  onOpenFilesDirectory: (paperId: string) => Promise<void>;
+  onOpenFile: (paperId: string, name: string) => Promise<void>;
 }
 
 export const VaultPanel: React.FC<VaultPanelProps> = ({
@@ -20,19 +20,21 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
   onAddFile,
   onRemoveFile,
   onOpenFile,
-  onOpenFilesDirectory
+  onOpenFilesDirectory,
 }) => {
-  const filteredSavedPapers: Paper[] = (savedPapers) ?
-    savedPapers.filter(paper =>
-      paper.title.toLowerCase().includes(filterQuery) ||
-      paper.authors.join(', ').toLowerCase().includes(filterQuery) ||
-      paper.abstract.toLowerCase().includes(filterQuery)
-    ) : [];
+  const filteredSavedPapers: Paper[] = savedPapers
+    ? savedPapers.filter(
+        (paper) =>
+          paper.title.toLowerCase().includes(filterQuery) ||
+          paper.authors.join(', ').toLowerCase().includes(filterQuery) ||
+          paper.abstract.toLowerCase().includes(filterQuery)
+      )
+    : [];
 
   return (
     <div className="db-panel">
       <div className="db-list">
-        {filteredSavedPapers.map(p => (
+        {filteredSavedPapers.map((p) => (
           <PaperCard
             key={p.id}
             paper={p}
@@ -50,5 +52,5 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};
