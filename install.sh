@@ -103,12 +103,12 @@ prepare_run_script() {
     # Check if REPO_PATH is already defined in the script
     if grep -q "^REPO_PATH=" "$temp_run_script"; then
         # Replace existing REPO_PATH line
-        sed -i "s|^REPO_PATH=.*|REPO_PATH=\"$repo_path\"|" "$temp_run_script"
+        perl -i -pe "s|^REPO_PATH=.*|REPO_PATH=\"$repo_path\"|" "$temp_run_script"
     else
         # Insert REPO_PATH after the shebang
-        sed -i "1a\\\n# Repository path - set during installation\nREPO_PATH=\"$repo_path\"" "$temp_run_script"
+        perl -i -pe "print \"# Repository path - set during installation\nREPO_PATH=\\\"$repo_path\\\"\n\" if \$. == 1" "$temp_run_script"
     fi
-    
+
     echo "$temp_run_script"
 }
 
