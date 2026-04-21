@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { Paper } from "./types";
-import { VaultService } from "./services/vault";
-import { BibTeXService } from "./services/bibtex";
-import { ArXivClient } from "./services/arxiv";
-import { SciHubClient } from "./services/sciHub";
-import { OpenAlexClient } from "./services/openAlex";
+import { Paper } from "./types.js";
+import { VaultService } from "./services/vault.js";
+import { BibTeXService } from "./services/bibtex.js";
+import { ArXivClient } from "./services/arxiv.js";
+import { SciHubClient } from "./services/sciHub.js";
+import { OpenAlexClient } from "./services/openAlex.js";
 
 const healthcheck = async (req: Request, res: Response) => {
   res.status(200).json({ message: "PaperVault service is OK:)" });

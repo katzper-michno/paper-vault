@@ -1,4 +1,4 @@
-import { Paper } from "../types";
+import { Paper } from "../types.js";
 
 // Function to escape BibTeX special characters
 const escapeBibTeX = (str: string): string => {

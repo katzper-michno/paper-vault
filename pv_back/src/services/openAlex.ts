@@ -1,4 +1,4 @@
-import { Paper } from "../types";
+import { Paper } from "../types.js";
 import axios from "axios";
 
 interface OpenAlexWork {

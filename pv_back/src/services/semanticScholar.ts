@@ -1,6 +1,6 @@
 import axios from "axios";
-import { Paper } from "../types";
-import { VaultService } from "./vault";
+import { Paper } from "../types.js";
+import { VaultService } from "./vault.js";
 
 export class SemanticScholarError extends Error {
   constructor(
