@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Paper } from "../types";
+import { Paper } from "../types.js";
 
 const generateLink = async (paper: Paper): Promise<string | undefined> => {
   if (!paper.doi) return undefined;
