@@ -1,5 +1,5 @@
 import path from "node:path"
-import { VaultService } from "./vault"
+import { VaultService } from "./vault.js"
 import { existsSync, renameSync } from "node:fs"
 
 const migrateLegacyVaultEntry = (paper: any) => {

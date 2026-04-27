@@ -1,6 +1,6 @@
-import { Paper } from "../types";
+import { Paper } from "../types.js";
 import axios from "axios";
-import { VaultService } from "./vault";
+import { VaultService } from "./vault.js";
 
 interface OpenAlexWork {
   id: string;

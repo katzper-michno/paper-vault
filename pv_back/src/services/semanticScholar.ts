@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { Paper } from "../types";
-import { VaultService } from "./vault";
+import { Paper } from "../types.js";
+import { VaultService } from "./vault.js";
 
 interface SemanticScholarAuthor {
   name: string

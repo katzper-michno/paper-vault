@@ -1,5 +1,5 @@
 import path from "node:path";
-import { Paper } from "../types";
+import { Paper } from "../types.js";
 import {
   existsSync,
   mkdirSync,
