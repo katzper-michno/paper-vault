@@ -36,7 +36,7 @@ const convertDOIToId = (doi: string): string => {
 }
 
 const populateWithFiles = (paper: Paper): Paper => {
-  const filesDirPath = path.join(vaultPath(), "files", paper.doi);
+  const filesDirPath = path.join(vaultPath(), "files", paper.id);
   const files = existsSync(filesDirPath) ? readdirSync(filesDirPath) : [];
   return { ...paper, files };
 };
