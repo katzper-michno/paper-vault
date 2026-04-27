@@ -1,6 +1,6 @@
 [
   {
-    "id": "W4403920277",
+    "id": "10.48550__arxiv.2410.03444",
     "title": "Factoring through monomial representations: arithmetic characterizations and ambiguity of weighted automata",
     "authors": [
       "Antoni Puch",
@@ -16,7 +16,7 @@
     }
   },
   {
-    "id": "W4289856124",
+    "id": "10.1145__3531130.3533326",
     "title": "Transducers of polynomial growth",
     "authors": [
       "Mikołaj Bojańczyk"
@@ -30,7 +30,7 @@
     }
   },
   {
-    "id": "W4392810066",
+    "id": "10.1007__s11083-024-09666-w",
     "title": "Boolean Dimension of a Boolean Lattice",
     "authors": [
       "Marcin Briański",
@@ -48,7 +48,7 @@
     }
   },
   {
-    "id": "W1979119667",
+    "id": "10.1109__lics.2012.24",
     "title": "Near Unanimity Constraints Have Bounded Pathwidth Duality",
     "authors": [
       "Libor Barto",
@@ -65,7 +65,7 @@
     }
   },
   {
-    "id": "W2991167089",
+    "id": "10.4230__lipics.itcs.2021.27",
     "title": "On Rich 2-to-1 Games",
     "authors": [
       "Mark Braverman",

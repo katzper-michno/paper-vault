@@ -1,9 +1,10 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import { router } from "./router";
+import { Legacy } from "./services/legacy";
 
-dotenv.config();
+// Migrate legacy vault entries
+Legacy.migrateLegacyVaultEntries()
 
 const app = express();
 

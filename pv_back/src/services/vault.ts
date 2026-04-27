@@ -20,6 +20,8 @@ const vaultPath = (): string => {
 
 const vaultMetaPath = (): string => path.join(vaultPath(), "vault.json");
 
+const vaultFilesPath = (): string => path.join(vaultPath(), "files");
+
 const vaultMeta = (): Paper[] =>
   JSON.parse(readFileSync(vaultMetaPath(), "utf-8")) as Paper[];
 
@@ -88,26 +90,28 @@ const deletePaper = (id: string) => {
 };
 
 const addFile = (id: string, file: Express.Multer.File): string => {
-  const dest = path.join(vaultPath(), "files", id, file.originalname);
+  const dest = path.join(vaultFilesPath(), id, file.originalname);
   mkdirSync(path.dirname(dest), { recursive: true });
   writeFileSync(dest, file.buffer);
   return file.originalname;
 };
 
 const deleteFile = (id: string, fileName: string) =>
-  rmSync(path.join(vaultPath(), "files", id, fileName));
+  rmSync(path.join(vaultFilesPath(), id, fileName));
 
 const openFilesDir = (id: string) => {
-  const filesPath = path.join(vaultPath(), "files", id);
+  const filesPath = path.join(vaultFilesPath(), id);
   mkdirSync(filesPath, { recursive: true });
   open(filesPath);
 };
 
 const openFile = (id: string, fileName: string) =>
-  open(path.join(vaultPath(), "files", id, fileName));
+  open(path.join(vaultFilesPath(), id, fileName));
 
 export const VaultService = {
   convertDOIToId,
+  vaultFilesPath,
+  savePapers,
   getPapers,
   getPaper,
   paperExists,
