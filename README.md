@@ -59,11 +59,14 @@ The installation script should create a basic configuration file in `~/.config/p
   "BACKEND_PORT": "3001",
   "FRONTEND_PORT": "5173",
   "OPEN_ALEX_API_KEY": "",
+  "SEMANTIC_SCHOLAR_API_KEY": "",
   "VAULT_PATH": "/path/to/cloned/repository/vault_example"
 }
 ```
 
 The `OPEN_ALEX_API_KEY` stores your private key to OpenAlex API. **It is not necessary**, but the "web search" functionality of `paper-vault` might be limited without it. Moreover, you can generate the key for free, and **you don't have to send any emails to do it!** - you just have to create an account on [OpenAlex](https://openalex.org/). Check out [official OpenAlex docs](https://developers.openalex.org/guides/authentication#getting-an-api-key) for more information.
+
+Similarly with `SEMANTIC_SCHOLAR_API_KEY`, although, it this case, the key is rather required, otherwise the "web search" functionality will just not use Semantic Scholar as a backend. Also, the key application is a bit more of a hustle, you actually have to fill a form on [Semantic Scholar API-KEY form](https://www.semanticscholar.org/product/api#api-key-form) to receive it.
 
 Next, the `VAULT_PATH` stores the path to... your vault. By default, it will be set to an example vault in `vault_example`, but you are free to create your own vault anywhere on your machine.
 

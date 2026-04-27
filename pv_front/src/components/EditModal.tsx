@@ -149,14 +149,16 @@ export const EditModal: React.FC<EditModalProps> = ({ paper, onClose, onSave }) 
             </div>
           </div>
 
-          <div className="mfield">
-            <div className="mlabel">DOI</div>
-            <input
-              value={draft.doi}
-              onChange={(e) => set('doi', e.target.value)}
-              placeholder="10.xxxx/xxxxx"
-            />
-          </div>
+          {/* Currently hidden, because we now use DOI as primary key in the vault. */}
+          {/* <div className="mfield"> */}
+          {/*   <div className="mlabel">DOI</div> */}
+          {/*   <input */}
+          {/*     disabled={true} */}
+          {/*     value={draft.doi} */}
+          {/*     onChange={(e) => set('doi', e.target.value)} */}
+          {/*     placeholder="10.xxxx/xxxxx" */}
+          {/*   /> */}
+          {/* </div> */}
 
           <div className="mfield">
             <div className="mlabel">OpenAlex</div>

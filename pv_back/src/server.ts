@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
 import { router } from "./router.js";
+import { Legacy } from "./services/legacy.js";
+
+// Migrate legacy vault entries
+Legacy.migrateLegacyVaultEntries();
 
 const app = express();
 

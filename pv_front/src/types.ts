@@ -1,5 +1,6 @@
 export interface PaperUrls {
   openAlex?: string;
+  semanticScholar?: string;
   arxiv?: string;
   sciHub?: string;
 }

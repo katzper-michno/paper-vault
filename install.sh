@@ -70,6 +70,7 @@ create_config() {
   "BACKEND_PORT": "3001",
   "FRONTEND_PORT": "5173",
   "OPEN_ALEX_API_KEY": "",
+  "SEMANTIC_SCHOLAR_API_KEY": "",
   "VAULT_PATH": "${repo_path}/vault_example"
 }
 EOF

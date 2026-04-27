@@ -1,5 +1,6 @@
 import { Paper } from "../types.js";
 import axios from "axios";
+import { VaultService } from "./vault.js";
 
 interface OpenAlexWork {
   id: string;
@@ -45,6 +46,7 @@ export async function searchPapers(query: string): Promise<Paper[]> {
     "https://api.openalex.org/works?" +
     `search=${encodeURIComponent(query)}` +
     "&per-page=10" +
+    "&include_xpac=true" +
     (API_KEY ? `&api_key=${API_KEY}` : "");
 
   console.log(`[OpenAlexClient] Sending request with URL: ${url}`);
@@ -55,31 +57,33 @@ export async function searchPapers(query: string): Promise<Paper[]> {
 
   console.log(`[OpenAlexClient] Obtained ${response.data.meta.count} results`);
 
-  return response.data.results.map((work: OpenAlexWork) => {
-    const venue =
-      work.primary_location?.source?.display_name ??
-      work.primary_location?.raw_source_name ??
-      "";
+  return response.data.results
+    .filter((work: OpenAlexWork) => Boolean(work.doi))
+    .map((work: OpenAlexWork) => {
+      const venue =
+        work.primary_location?.source?.display_name ??
+        work.primary_location?.raw_source_name ??
+        "";
 
-    const doi = work.doi
-      ? work.doi.startsWith("https://doi.org/")
-        ? work.doi.slice("https://doi.org/".length)
-        : work.doi
-      : undefined;
+      const doi: string = (
+        work.doi!.startsWith("https://doi.org/")
+          ? work.doi!.slice("https://doi.org/".length)
+          : work.doi!
+      ).toLowerCase();
 
-    return {
-      id: work.id.split("/").reverse()[0],
-      title: work.title,
-      authors: work.authorships.map((a) => a.author.display_name),
-      abstract: reconstructAbstract(work.abstract_inverted_index),
-      year: work.publication_year,
-      venue: venue,
-      doi: doi,
-      urls: {
-        openAlex: work.id,
-      },
-    };
-  });
+      return {
+        id: VaultService.convertDOIToId(doi),
+        title: work.title,
+        authors: work.authorships.map((a) => a.author.display_name),
+        abstract: reconstructAbstract(work.abstract_inverted_index),
+        year: work.publication_year,
+        venue: venue,
+        doi: doi,
+        urls: {
+          openAlex: work.id,
+        },
+      };
+    });
 }
 
 export const OpenAlexClient = {

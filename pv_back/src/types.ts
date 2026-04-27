@@ -5,13 +5,12 @@ export interface Paper {
   abstract: string;
   year: number;
   venue: string;
-  doi?: string;
   urls: {
     openAlex?: string;
-    semanticScholar?: string; // currently not used
+    semanticScholar?: string;
     arxiv?: string;
     sciHub?: string;
   };
+  doi: string;
   files?: string[];
-  saved?: boolean;
 }

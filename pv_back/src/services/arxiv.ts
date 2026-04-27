@@ -1,7 +1,7 @@
 import { Paper } from "../types.js";
 
 const generateLink = (paper: Paper): string | undefined =>
-  paper.doi && paper.doi.toLowerCase().includes("arxiv")
+  paper.doi.toLowerCase().includes("arxiv")
     ? `https://doi.org/${paper.doi}`
     : undefined;
 

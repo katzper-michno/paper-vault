@@ -18,6 +18,10 @@
   --orange-bd: #fac775;
   --orange-tx: #854f0b;
 
+  --yellow-bg: #fbf5e4;
+  --yellow-bd: #ead186;
+  --yellow-tx: #a48119;
+
   --ss-h-bg: #e6f1fb;
   --ss-h-bd: #85b7eb;
   --ss-h-tx: #185fa5;
@@ -30,6 +34,7 @@
   --save-h-bg: #eaf3de;
   --save-h-bd: #97c459;
   --save-h-tx: #3b6d11;
+
   --del-h-bg: #fcebeb;
   --del-h-bd: #f09595;
   --del-h-tx: #a32d2d;
@@ -46,9 +51,11 @@
   --bg0: #1e1e1c;
   --bg1: #272724;
   --bg2: #303030;
+
   --border0: rgba(255, 255, 255, 0.09);
   --border1: rgba(255, 255, 255, 0.16);
   --border2: rgba(255, 255, 255, 0.28);
+
   --text0: #e8e8e4;
   --text1: #a0a09b;
   --text2: #636360;
@@ -60,6 +67,11 @@
   --orange-bg: #2a200a;
   --orange-bd: #7a4a0a;
   --orange-tx: #f5c070;
+
+  --yellow-bg: #352b0d;
+  --yellow-bd: #a58218;
+  --yellow-tx: #e7cc79;
+
   --ss-h-bg: #0d1f34;
   --ss-h-bd: #185fa5;
   --ss-h-tx: #7ab8e8;
@@ -72,6 +84,7 @@
   --save-h-bg: #172810;
   --save-h-bd: #3a6010;
   --save-h-tx: #90c45a;
+
   --del-h-bg: #2e1212;
   --del-h-bd: #8a2a2a;
   --del-h-tx: #f09090;
@@ -394,6 +407,12 @@
   background: var(--ss-h-bg);
   border-color: var(--ss-h-bd);
   color: var(--ss-h-tx);
+}
+
+.ext-link.ss:hover {
+  background: var(--yellow-bg);
+  border-color: var(--yellow-bd);
+  color: var(--yellow-tx);
 }
 
 .ext-link.arxiv:hover {
