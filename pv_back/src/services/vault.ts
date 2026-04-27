@@ -34,8 +34,8 @@ const convertDOIToId = (doi: string): string => {
   let safe = doi.trim().toLowerCase();
   safe = safe.replace("/", "__");
   safe = safe.replace(/[^\w.\-]/g, "_");
-  return safe
-}
+  return safe;
+};
 
 const populateWithFiles = (paper: Paper): Paper => {
   const filesDirPath = path.join(vaultPath(), "files", paper.id);

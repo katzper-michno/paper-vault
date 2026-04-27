@@ -3,7 +3,7 @@ import { Paper } from "../types.js";
 import { VaultService } from "./vault.js";
 
 interface SemanticScholarAuthor {
-  name: string
+  name: string;
 }
 
 interface SemanticScholarWork {
@@ -13,19 +13,19 @@ interface SemanticScholarWork {
   venue?: string;
   abstract: string;
   externalIds?: {
-    DOI?: string,
-    ArXiv?: string
-  }
+    DOI?: string;
+    ArXiv?: string;
+  };
   url: string;
   openAccessPdf?: {
-    url?: string
-  }
+    url?: string;
+  };
 }
 
 interface SemanticScholarResponse {
-  total: number,
-  offset: number,
-  next: number,
+  total: number;
+  offset: number;
+  next: number;
   data: SemanticScholarWork[];
 }
 
@@ -45,25 +45,27 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
 
   // Use Semantic Scholar API to search for papers
   const searchUrl =
-    'https://api.semanticscholar.org/graph/v1/paper/search' +
+    "https://api.semanticscholar.org/graph/v1/paper/search" +
     `?query=${encodeURIComponent(searchTerm)}` +
-    '&limit=10' +
-    '&fields=title,authors,year,venue,abstract,externalIds,url,openAccessPdf';
+    "&limit=10" +
+    "&fields=title,authors,year,venue,abstract,externalIds,url,openAccessPdf";
 
-  const headers = API_KEY ? { 'x-api-key': API_KEY } : {}
+  const headers = API_KEY ? { "x-api-key": API_KEY } : {};
 
-  console.log(`[SemanticScholarClient] Sending request with URL: ${searchUrl}, and headers: ${JSON.stringify(headers)}`);
+  console.log(
+    `[SemanticScholarClient] Sending request with URL: ${searchUrl}, and headers: ${JSON.stringify(headers)}`,
+  );
 
   const response = await axios.get<SemanticScholarResponse>(searchUrl, {
     headers,
     timeout: 10000,
-    validateStatus: function(status) {
+    validateStatus: function (status) {
       return status >= 200 && status < 500;
     },
   });
 
   if (response.status != 200) {
-    throw throwProperError(response)
+    throw throwProperError(response);
   }
 
   console.log(`[OpenAlexClient] Obtained ${response.data.total} results`);
@@ -73,18 +75,20 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
   }
 
   return response.data.data
-    .filter((work: SemanticScholarWork) => Boolean(work.externalIds?.DOI) || Boolean(work.externalIds?.ArXiv))
+    .filter(
+      (work: SemanticScholarWork) =>
+        Boolean(work.externalIds?.DOI) || Boolean(work.externalIds?.ArXiv),
+    )
     .map((work: SemanticScholarWork): Paper => {
-
       let doi = work.externalIds?.DOI?.startsWith("https://doi.org/")
         ? work.externalIds?.DOI?.slice("https://doi.org/".length)
-        : work.externalIds?.DOI
+        : work.externalIds?.DOI;
 
       if (doi == undefined && Boolean(work.externalIds?.ArXiv)) {
-        doi = "10.48550/arxiv." + work.externalIds!.ArXiv!
+        doi = "10.48550/arxiv." + work.externalIds!.ArXiv!;
       }
 
-      doi = doi!.toLowerCase()
+      doi = doi!.toLowerCase();
 
       return {
         id: VaultService.convertDOIToId(doi!),
@@ -97,8 +101,8 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
         urls: {
           semanticScholar: work.url,
         },
-      }
-    })
+      };
+    });
 };
 
 const throwProperError = (response: AxiosResponse) => {
@@ -116,9 +120,7 @@ const throwProperError = (response: AxiosResponse) => {
       JSON.stringify(response.data, null, 2),
     );
     const errorMsg =
-      response.data?.message ||
-      response.data?.error ||
-      "Invalid search query";
+      response.data?.message || response.data?.error || "Invalid search query";
     throw new SemanticScholarError(
       400,
       `Bad request: ${errorMsg}. Try simplifying your search query.`,
@@ -133,7 +135,7 @@ const throwProperError = (response: AxiosResponse) => {
       `Search failed with status ${response.status}. ${response.data?.message || ""}`,
     );
   }
-}
+};
 
 export const SemanticScholarClient = {
   searchPapers,

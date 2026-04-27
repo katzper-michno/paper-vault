@@ -4,7 +4,7 @@ import { router } from "./router.js";
 import { Legacy } from "./services/legacy.js";
 
 // Migrate legacy vault entries
-Legacy.migrateLegacyVaultEntries()
+Legacy.migrateLegacyVaultEntries();
 
 const app = express();
 

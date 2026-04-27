@@ -42,44 +42,51 @@ const printUrlResolutionTable = (papers: Paper[]): void => {
 
 // Sometimes, we are able to deduce some information in a non-direct way
 const extrapolateMoreData = (paper: Paper) => {
-  let venue = paper.venue
+  let venue = paper.venue;
 
-  if (Boolean(paper.venue) === false && paper.doi.toLowerCase().includes('arxiv')) {
-    venue = 'arXiv'
+  if (
+    Boolean(paper.venue) === false &&
+    paper.doi.toLowerCase().includes("arxiv")
+  ) {
+    venue = "arXiv";
   }
 
   return {
     ...paper,
-    venue
-  }
-}
+    venue,
+  };
+};
 
 const mergeEnhanceAndFilterResults = (oa: Paper[], ss: Paper[]) => {
   // Semantic Scholar results usually contain more information, so we remove duplicates prioritizing them
   const ssWithOALinks: Paper[] = ss.map((paper: Paper) => {
-    const oaEntry = oa.find((other: Paper) => other.doi === paper.doi)
-    return oaEntry ? {
-      ...paper,
-      abstract: Boolean(paper.abstract) ? paper.abstract : oaEntry.abstract, // For some reason, sometimes SS returns no abstract
-      urls: {
-        ...paper.urls,
-        openAlex: oaEntry.urls.openAlex
-      },
-    } : paper
-  })
+    const oaEntry = oa.find((other: Paper) => other.doi === paper.doi);
+    return oaEntry
+      ? {
+          ...paper,
+          abstract: Boolean(paper.abstract) ? paper.abstract : oaEntry.abstract, // For some reason, sometimes SS returns no abstract
+          urls: {
+            ...paper.urls,
+            openAlex: oaEntry.urls.openAlex,
+          },
+        }
+      : paper;
+  });
 
-  const oaWithoutDuplicates = oa.filter((paper: Paper) => !ss.some((other: Paper) => other.doi == paper.doi))
+  const oaWithoutDuplicates = oa.filter(
+    (paper: Paper) => !ss.some((other: Paper) => other.doi == paper.doi),
+  );
 
   const isNotGarbage = (_: Paper) => {
     // TODO: What is garbage?
     return true;
-  }
+  };
 
   // Interleaving to avoid pushing only one source to the top
   return interleaveResults(ssWithOALinks, oaWithoutDuplicates)
     .map(extrapolateMoreData)
-    .filter(isNotGarbage)
-}
+    .filter(isNotGarbage);
+};
 
 const interleaveResults = (oa: Paper[], ss: Paper[]) =>
   Array.from({ length: Math.max(oa.length, ss.length) })
@@ -96,17 +103,24 @@ const search = async (
     return res.status(400).json({ message: 'Query parameter "q" is required' });
   }
 
-  const searchQuery = q.trim().toLowerCase()
+  const searchQuery = q.trim().toLowerCase();
 
-  const openAlexResults = await OpenAlexClient.searchPapers(searchQuery)
-  let semanticScholarResults: Paper[] = []
+  const openAlexResults = await OpenAlexClient.searchPapers(searchQuery);
+  let semanticScholarResults: Paper[] = [];
   try {
-    semanticScholarResults = await SemanticScholarClient.searchPapers(searchQuery)
+    semanticScholarResults =
+      await SemanticScholarClient.searchPapers(searchQuery);
   } catch (error: any) {
-    console.log("[Controller] Error when searching for papers on semantic scholar:", error)
+    console.log(
+      "[Controller] Error when searching for papers on semantic scholar:",
+      error,
+    );
   }
 
-  const searchResults = mergeEnhanceAndFilterResults(openAlexResults, semanticScholarResults)
+  const searchResults = mergeEnhanceAndFilterResults(
+    openAlexResults,
+    semanticScholarResults,
+  );
 
   try {
     const resultsWithLinks = await Promise.all(

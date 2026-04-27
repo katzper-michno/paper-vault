@@ -44,14 +44,14 @@ export const HighlightedText = ({ text, query }: { text: string; query: string }
   const highlightedText = !query
     ? text
     : parts.map((part, index) =>
-      regex.test(part) ? (
-        <span key={index} className="highlighted-text">
-          {part}
-        </span>
-      ) : (
-        part
-      )
-    );
+        regex.test(part) ? (
+          <span key={index} className="highlighted-text">
+            {part}
+          </span>
+        ) : (
+          part
+        )
+      );
   return <>{highlightedText} </>;
 };
 
