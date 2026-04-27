@@ -13,7 +13,8 @@ interface SemanticScholarWork {
   venue?: string;
   abstract: string;
   externalIds?: {
-    DOI?: string
+    DOI?: string,
+    ArXiv?: string
   }
   url: string;
   openAccessPdf?: {
@@ -38,6 +39,8 @@ export class SemanticScholarError extends Error {
 }
 
 const searchPapers = async (query: string): Promise<Paper[]> => {
+  const API_KEY = process.env.SEMANTIC_SCHOLAR_API_KEY;
+
   const searchTerm = query.toLowerCase();
 
   // Use Semantic Scholar API to search for papers
@@ -47,14 +50,12 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
     '&limit=10' +
     '&fields=title,authors,year,venue,abstract,externalIds,url,openAccessPdf';
 
-  console.log(`[SemanticScholarClient] Sending request with URL: ${searchUrl}`);
+  const headers = API_KEY ? { 'x-api-key': API_KEY } : {}
 
-  const savedPapers = VaultService.getPapers();
+  console.log(`[SemanticScholarClient] Sending request with URL: ${searchUrl}, and headers: ${JSON.stringify(headers)}`);
 
   const response = await axios.get<SemanticScholarResponse>(searchUrl, {
-    headers: {
-      // 'x-api-key': process.env.SEMANTIC_SCHOLAR_API_KEY
-    },
+    headers,
     timeout: 10000,
     validateStatus: function(status) {
       return status >= 200 && status < 500;
@@ -65,26 +66,34 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
     throw throwProperError(response)
   }
 
+  console.log(`[OpenAlexClient] Obtained ${response.data.total} results`);
+
   if (!response.data.data || response.data.data.length === 0) {
     return [];
   }
 
   return response.data.data
-    .filter((work: SemanticScholarWork) => Boolean(work.externalIds?.DOI))
+    .filter((work: SemanticScholarWork) => Boolean(work.externalIds?.DOI) || Boolean(work.externalIds?.ArXiv))
     .map((work: SemanticScholarWork): Paper => {
 
-      const doi: string = work.externalIds!.DOI!.startsWith("https://doi.org/")
-        ? work.externalIds!.DOI!.slice("https://doi.org/".length)
-        : work.externalIds!.DOI!
+      let doi = work.externalIds?.DOI?.startsWith("https://doi.org/")
+        ? work.externalIds?.DOI?.slice("https://doi.org/".length)
+        : work.externalIds?.DOI
+
+      if (doi == undefined && Boolean(work.externalIds?.ArXiv)) {
+        doi = "10.48550/arxiv." + work.externalIds!.ArXiv!
+      }
+
+      doi = doi!.toLowerCase()
 
       return {
-        id: VaultService.convertDOIToId(doi),
+        id: VaultService.convertDOIToId(doi!),
         title: work.title,
         authors: work.authors.map((auth: any) => auth.name),
         abstract: work.abstract || "",
         year: work.year,
         venue: work.venue || "",
-        doi: doi,
+        doi: doi!,
         urls: {
           semanticScholar: work.url,
         },

@@ -12,6 +12,11 @@ export const ExtLinks: React.FC<LinkProps> = ({ urls }) => (
         ↗ OpenAlex
       </a>
     )}
+    {urls.semanticScholar && (
+      <a className="ext-link ss" href={urls.semanticScholar} target="_blank" rel="noreferrer">
+        ↗ Semantic Scholar
+      </a>
+    )}
     {urls.arxiv && (
       <a className="ext-link arxiv" href={urls.arxiv} target="_blank" rel="noreferrer">
         ↗ arXiv
@@ -39,14 +44,14 @@ export const HighlightedText = ({ text, query }: { text: string; query: string }
   const highlightedText = !query
     ? text
     : parts.map((part, index) =>
-        regex.test(part) ? (
-          <span key={index} className="highlighted-text">
-            {part}
-          </span>
-        ) : (
-          part
-        )
-      );
+      regex.test(part) ? (
+        <span key={index} className="highlighted-text">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
   return <>{highlightedText} </>;
 };
 

@@ -65,9 +65,9 @@ export async function searchPapers(query: string): Promise<Paper[]> {
         work.primary_location?.raw_source_name ??
         "";
 
-      const doi: string = work.doi!.startsWith("https://doi.org/")
+      const doi: string = (work.doi!.startsWith("https://doi.org/")
         ? work.doi!.slice("https://doi.org/".length)
-        : work.doi!
+        : work.doi!).toLowerCase()
 
       return {
         id: VaultService.convertDOIToId(doi),
