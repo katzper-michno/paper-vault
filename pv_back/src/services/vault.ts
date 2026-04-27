@@ -24,13 +24,19 @@ const vaultMeta = (): Paper[] =>
   JSON.parse(readFileSync(vaultMetaPath(), "utf-8")) as Paper[];
 
 const sanitizeToSave = (paper: Paper): Paper => {
-  delete paper.saved;
   delete paper.files;
   return paper;
 };
 
+const convertDOIToId = (doi: string): string => {
+  let safe = doi.trim().toLowerCase();
+  safe = safe.replace("/", "__");
+  safe = safe.replace(/[^\w.\-]/g, "_");
+  return safe
+}
+
 const populateWithFiles = (paper: Paper): Paper => {
-  const filesDirPath = path.join(vaultPath(), "files", paper.id);
+  const filesDirPath = path.join(vaultPath(), "files", paper.doi);
   const files = existsSync(filesDirPath) ? readdirSync(filesDirPath) : [];
   return { ...paper, files };
 };
@@ -101,6 +107,7 @@ const openFile = (id: string, fileName: string) =>
   open(path.join(vaultPath(), "files", id, fileName));
 
 export const VaultService = {
+  convertDOIToId,
   getPapers,
   getPaper,
   paperExists,

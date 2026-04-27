@@ -1,6 +1,32 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { Paper } from "../types";
 import { VaultService } from "./vault";
+
+interface SemanticScholarAuthor {
+  name: string
+}
+
+interface SemanticScholarWork {
+  title: string;
+  authors: SemanticScholarAuthor[];
+  year: number;
+  venue?: string;
+  abstract: string;
+  externalIds?: {
+    DOI?: string
+  }
+  url: string;
+  openAccessPdf?: {
+    url?: string
+  }
+}
+
+interface SemanticScholarResponse {
+  total: number,
+  offset: number,
+  next: number,
+  data: SemanticScholarWork[];
+}
 
 export class SemanticScholarError extends Error {
   constructor(
@@ -16,24 +42,58 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
 
   // Use Semantic Scholar API to search for papers
   const searchUrl =
-    `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(searchTerm)}` +
-    `&limit=10&fields=title,authors,year,venue,paperId,abstract,externalIds,url`;
+    'https://api.semanticscholar.org/graph/v1/paper/search' +
+    `?query=${encodeURIComponent(searchTerm)}` +
+    '&limit=10' +
+    '&fields=title,authors,year,venue,abstract,externalIds,url,openAccessPdf';
 
   console.log(`[SemanticScholarClient] Sending request with URL: ${searchUrl}`);
 
   const savedPapers = VaultService.getPapers();
 
-  const searchResponse = await axios.get(searchUrl, {
+  const response = await axios.get<SemanticScholarResponse>(searchUrl, {
     headers: {
       // 'x-api-key': process.env.SEMANTIC_SCHOLAR_API_KEY
     },
     timeout: 10000,
-    validateStatus: function (status) {
+    validateStatus: function(status) {
       return status >= 200 && status < 500;
     },
   });
 
-  if (searchResponse.status === 429) {
+  if (response.status != 200) {
+    throw throwProperError(response)
+  }
+
+  if (!response.data.data || response.data.data.length === 0) {
+    return [];
+  }
+
+  return response.data.data
+    .filter((work: SemanticScholarWork) => Boolean(work.externalIds?.DOI))
+    .map((work: SemanticScholarWork): Paper => {
+
+      const doi: string = work.externalIds!.DOI!.startsWith("https://doi.org/")
+        ? work.externalIds!.DOI!.slice("https://doi.org/".length)
+        : work.externalIds!.DOI!
+
+      return {
+        id: VaultService.convertDOIToId(doi),
+        title: work.title,
+        authors: work.authors.map((auth: any) => auth.name),
+        abstract: work.abstract || "",
+        year: work.year,
+        venue: work.venue || "",
+        doi: doi,
+        urls: {
+          semanticScholar: work.url,
+        },
+      }
+    })
+};
+
+const throwProperError = (response: AxiosResponse) => {
+  if (response.status === 429) {
     console.log(
       `[SemanticScholarClient] Rate limited. Please wait a moment and try again.`,
     );
@@ -41,59 +101,30 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
       429,
       "Too many requests. Please wait 10-30 seconds and try again.",
     );
-  } else if (searchResponse.status === 400) {
+  } else if (response.status === 400) {
     console.log(
       `[SemanticScholarClient] Bad Request (400). Response:`,
-      JSON.stringify(searchResponse.data, null, 2),
+      JSON.stringify(response.data, null, 2),
     );
     const errorMsg =
-      searchResponse.data?.message ||
-      searchResponse.data?.error ||
+      response.data?.message ||
+      response.data?.error ||
       "Invalid search query";
     throw new SemanticScholarError(
       400,
       `Bad request: ${errorMsg}. Try simplifying your search query.`,
     );
-  } else if (searchResponse.status !== 200) {
+  } else if (response.status !== 200) {
     console.log(
-      `[SemanticScholarClient] Search API returned status ${searchResponse.status}. Response:`,
-      JSON.stringify(searchResponse.data, null, 2),
+      `[SemanticScholarClient] Search API returned status ${response.status}. Response:`,
+      JSON.stringify(response.data, null, 2),
     );
     throw new SemanticScholarError(
-      searchResponse.status,
-      `Search failed with status ${searchResponse.status}. ${searchResponse.data?.message || ""}`,
+      response.status,
+      `Search failed with status ${response.status}. ${response.data?.message || ""}`,
     );
   }
-
-  if (!searchResponse.data.data || searchResponse.data.data.length === 0) {
-    return [];
-  }
-
-  let responsePapers = searchResponse.data.data;
-
-  const getPaperId = (p: any): string => p.id ?? p.paperId ?? "ID_MISSING";
-
-  const papersWithSavedStatus = responsePapers.map((paper: any) => ({
-    ...paper,
-    saved: savedPapers.some((saved) => getPaperId(saved) === getPaperId(paper)),
-  }));
-
-  return papersWithSavedStatus.map(
-    (paper: any): Paper => ({
-      id: paper.paperId,
-      title: paper.title,
-      authors: paper.authors.map((auth: any) => auth.name),
-      abstract: paper.abstract || "N/A",
-      year: paper.year || "N/A",
-      venue: paper.venue || "N/A",
-      doi: paper.externalIds?.DOI || undefined,
-      urls: {
-        semanticScholar: paper.url || undefined,
-      },
-      saved: paper.saved,
-    }),
-  );
-};
+}
 
 export const SemanticScholarClient = {
   searchPapers,
