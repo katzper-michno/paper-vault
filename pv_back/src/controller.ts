@@ -174,6 +174,24 @@ const addPaper = async (
 
   try {
     VaultService.addPaper(paper);
+
+    try {
+      if (paper.urls.arxiv) {
+        const arxivPdf = await ArXivClient.downloadPdf(paper.doi);
+        VaultService.addFile(paper.id, arxivPdf);
+      }
+      if (paper.urls.sciHub) {
+        const sciHubPdf = await SciHubClient.downloadPdf(paper.doi);
+        VaultService.addFile(paper.id, sciHubPdf);
+      }
+    } catch (error: any) {
+      // We do not want the entire request to fail.
+      console.warn(
+        "[Controller] There was an error when downloading pdfs: ",
+        error,
+      );
+    }
+
     res.status(201).json(VaultService.getPaper(paper.id));
   } catch (error: any) {
     console.log("[Controller] Error when adding new paper:", error);

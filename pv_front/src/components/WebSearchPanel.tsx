@@ -53,7 +53,7 @@ export const WebSearchPanel: React.FC<WebSearchPanelProps> = ({ isOpen, savedIds
           <form onSubmit={handleSearch} className="web-input-wrap">
             <input
               type="text"
-              placeholder="Search for a paper on OpenAlex…"
+              placeholder="Search for a paper online…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

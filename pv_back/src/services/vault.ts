@@ -87,6 +87,7 @@ const deletePaper = (id: string) => {
     throw new Error(`Paper with id ${id} not found`);
   }
   savePapers(papers.filter((p: Paper) => p.id !== id));
+  rmSync(path.join(vaultFilesPath(), id), { recursive: true });
 };
 
 const addFile = (id: string, file: Express.Multer.File): string => {
