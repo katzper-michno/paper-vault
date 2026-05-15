@@ -72,7 +72,7 @@ const App: React.FC = () => {
   const handleSave = async (paper: WebPaper): Promise<void> => {
     try {
       const res = await axios.post<Paper>(`${SERVER_HOST}/papers`, paper);
-      setSavedPapers((prev) => [res.data, ...prev]);
+      setSavedPapers((prev) => [...prev, res.data]);
     } catch (err: any) {
       console.error('Error saving paper:', err);
       toast.error(`Error saving paper: ${err.response?.data.message || err}`);

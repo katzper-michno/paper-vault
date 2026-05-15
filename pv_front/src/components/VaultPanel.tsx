@@ -34,7 +34,7 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
   return (
     <div className="db-panel">
       <div className="db-list">
-        {filteredSavedPapers.map((p) => (
+        {filteredSavedPapers.reverse().map((p) => (
           <PaperCard
             key={p.id}
             paper={p}
