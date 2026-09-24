@@ -13,6 +13,7 @@ export interface EditFormValues {
   year: number;
   doi: string;
   urls: PaperUrls;
+  note?: string;
 }
 
 export interface WebPaper extends EditFormValues {

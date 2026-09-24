@@ -43,6 +43,12 @@
   --saved-bd: #97c459;
   --saved-tx: #3b6d11;
 
+  --note-bg: #e8f7f5;
+  --note-bd: #6dc4ba;
+  --note-tx: #1a6660;
+  --note-hl-bg: #1a6660;
+  --note-hl-tx: #e8f7f5;
+
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--text0);
 }
@@ -92,6 +98,12 @@
   --saved-bg: #172810;
   --saved-bd: #3a6010;
   --saved-tx: #90c45a;
+
+  --note-bg: #0d2422;
+  --note-bd: #1e5e58;
+  --note-tx: #65b8b0;
+  --note-hl-bg: #65b8b0;
+  --note-hl-tx: #0d2422;
 }
 
 /* ── Reset ── */
@@ -116,6 +128,11 @@
   background-color: var(--saved-bg);
   color: var(--saved-tx);
   font-weight: bold;
+}
+
+.note-box .highlighted-text {
+  background-color: var(--note-hl-bg);
+  color: var(--note-hl-tx);
 }
 
 /* ── Topbar ── */
@@ -377,7 +394,19 @@
   color: var(--venue-tx);
 }
 
-/* External links */
+/* External links + Add-note button row */
+.links-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+
+.links-row .ext-links {
+  margin-bottom: 0;
+}
+
 .ext-links {
   display: flex;
   gap: 4px;
@@ -451,15 +480,17 @@
   overflow: hidden;
 }
 
-.abstract-expand {
+.abstract-expand,
+.note-expand {
   color: var(--blue);
   cursor: pointer;
   font-size: 12px;
-  display: inline-block;
+  display: inline;
   white-space: nowrap;
 }
 
-.abstract-expand:hover {
+.abstract-expand:hover,
+.note-expand:hover {
   text-decoration: underline;
 }
 
@@ -890,6 +921,127 @@
 
 .btn-save:hover {
   opacity: 0.85;
+}
+
+/* ── Note ── */
+.note-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  background: var(--note-bg);
+  border: 0.5px solid var(--note-bd);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 5px;
+}
+
+.note-text {
+  flex: 1;
+  font-size: 12px;
+  color: var(--note-tx);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.note-box-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.note-box:hover .note-box-actions {
+  opacity: 1;
+}
+
+.note-act-btn {
+  font-size: 11px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 0.5px solid var(--note-bd);
+  background: transparent;
+  color: var(--note-tx);
+  cursor: pointer;
+  line-height: 1.5;
+  transition: all 0.1s;
+}
+
+.note-act-btn:hover {
+  background: var(--note-bd);
+  color: var(--bg0);
+}
+
+.note-act-btn.del:hover {
+  background: var(--del-h-bg);
+  border-color: var(--del-h-bd);
+  color: var(--del-h-tx);
+}
+
+.add-note-btn {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 6px;
+  border: 0.5px solid var(--note-bd);
+  background: var(--note-bg);
+  color: var(--note-tx);
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s;
+}
+
+.paper-card:hover .add-note-btn {
+  opacity: 1;
+}
+
+.add-note-btn:hover {
+  background: var(--note-bd);
+  color: var(--bg0);
+}
+
+.note-edit-area {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.note-textarea {
+  width: 100%;
+  min-height: 64px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  line-height: 1.55;
+  border: 0.5px solid var(--note-bd);
+  border-radius: 8px;
+  background: var(--note-bg);
+  color: var(--note-tx);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.note-textarea::placeholder {
+  color: var(--note-tx);
+  opacity: 0.5;
+}
+
+.note-textarea:focus {
+  border-color: var(--note-tx);
+}
+
+.note-edit-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.note-modal-textarea {
+  height: 80px;
 }
 
 /* ── BibTeX modal ── */

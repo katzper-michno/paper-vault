@@ -6,6 +6,7 @@ interface VaultPanelProps {
   filterQuery: string;
   onEdit: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
+  onUpdateNote: (id: string, note: string | undefined) => Promise<void>;
   onAddFile: (paperId: string, file: File) => Promise<void>;
   onRemoveFile: (paperId: string, name: string) => Promise<void>;
   onOpenFilesDirectory: (paperId: string) => Promise<void>;
@@ -17,6 +18,7 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
   filterQuery,
   onEdit,
   onDelete,
+  onUpdateNote,
   onAddFile,
   onRemoveFile,
   onOpenFile,
@@ -27,7 +29,8 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
         (paper) =>
           paper.title.toLowerCase().includes(filterQuery) ||
           paper.authors.join(', ').toLowerCase().includes(filterQuery) ||
-          paper.abstract.toLowerCase().includes(filterQuery)
+          paper.abstract.toLowerCase().includes(filterQuery) ||
+          (paper.note?.toLowerCase().includes(filterQuery) ?? false)
       )
     : [];
 
@@ -41,6 +44,7 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
             filterQuery={filterQuery}
             onEdit={onEdit}
             onDelete={onDelete}
+            onUpdateNote={onUpdateNote}
             onAddFile={onAddFile}
             onRemoveFile={onRemoveFile}
             onOpenFile={onOpenFile}

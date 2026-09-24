@@ -55,39 +55,36 @@ export const HighlightedText = ({ text, query }: { text: string; query: string }
   return <>{highlightedText} </>;
 };
 
+const COLLAPSED_CHAR_LIMIT = 300;
+
+export const trimToLimit = (text: string, limit: number): string => {
+  if (text.length <= limit) return text;
+  const cut = text.slice(0, limit);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace === -1 ? cut : cut.slice(0, lastSpace)) + '...';
+};
+
 export const Abstract: React.FC<{
   text: string;
   filterQuery: string;
 }> = ({ text, filterQuery }) => {
-  const COLLAPSED_ABSTRACT_CHARACTER_LIMIT = 300;
-  const isAbsCollapsible = text.length > COLLAPSED_ABSTRACT_CHARACTER_LIMIT;
+  const isCollapsible = text.length > COLLAPSED_CHAR_LIMIT;
+  const [userExpanded, setUserExpanded] = useState<boolean>(false);
 
-  const [isAbsExpanded, setIsAbsExpanded] = useState<boolean>(false);
+  // Auto-expand whenever the query matches anywhere in the text.
+  // Derived — collapses automatically when query is cleared.
+  const matchInText =
+    isCollapsible && !!filterQuery && text.toLowerCase().includes(filterQuery.toLowerCase());
 
-  const trimmedText = (text: string, limit: number): string => {
-    if (text.length <= limit) return text;
-
-    const trimmed = text.slice(0, limit);
-    const lastSpaceIndex = trimmed.lastIndexOf(' ');
-
-    const finalText = lastSpaceIndex === -1 ? trimmed : trimmed.slice(0, lastSpaceIndex);
-
-    return finalText + '...';
-  };
-
-  const abstractText = (): string =>
-    !isAbsCollapsible || isAbsExpanded
-      ? text
-      : trimmedText(text, COLLAPSED_ABSTRACT_CHARACTER_LIMIT);
-
-  const toggleExpand = () => setIsAbsExpanded((prev) => !prev);
+  const isExpanded = userExpanded || matchInText;
+  const displayText = !isCollapsible || isExpanded ? text : trimToLimit(text, COLLAPSED_CHAR_LIMIT);
 
   return (
     <div className="abstract">
-      <HighlightedText text={abstractText()} query={filterQuery} />
-      {isAbsCollapsible && (
-        <span onClick={toggleExpand} className="abstract-expand">
-          {isAbsExpanded ? '△ Less' : '▽ More'}
+      <HighlightedText text={displayText} query={filterQuery} />
+      {isCollapsible && !matchInText && (
+        <span onClick={() => setUserExpanded((p) => !p)} className="abstract-expand">
+          {isExpanded ? '△ Less' : '▽ More'}
         </span>
       )}
     </div>

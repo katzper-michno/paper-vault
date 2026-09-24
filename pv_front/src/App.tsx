@@ -106,6 +106,7 @@ const App: React.FC = () => {
         sciHub: values.urls.sciHub,
       },
       abstract: values.abstract,
+      note: values.note,
     };
 
     try {
@@ -126,6 +127,18 @@ const App: React.FC = () => {
     setEditingPaper(null);
     editingPromise.current.resolve!();
     editingPromise.current = {};
+  };
+
+  const handleUpdateNote = async (id: string, note: string | undefined): Promise<void> => {
+    const paper = savedPapers.find((p) => p.id === id)!;
+    const updated = { ...paper, note };
+    try {
+      await axios.put(`${SERVER_HOST}/papers/${id}`, updated);
+      setSavedPapers((prev) => prev.map((p) => (p.id === id ? updated : p)));
+    } catch (err: any) {
+      console.error('Error updating note:', err);
+      toast.error(`Error updating note: ${err.response?.data.message || err}`);
+    }
   };
 
   const handleAddFile = async (paperId: string, file: File): Promise<void> => {
@@ -256,6 +269,7 @@ const App: React.FC = () => {
             filterQuery={libraryQuery.toLowerCase()}
             onDelete={handleRemove}
             onEdit={handleEdit}
+            onUpdateNote={handleUpdateNote}
             onAddFile={handleAddFile}
             onRemoveFile={handleRemoveFile}
             onOpenFilesDirectory={handleOpenFilesDirectory}

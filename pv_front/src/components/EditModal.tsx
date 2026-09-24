@@ -9,7 +9,7 @@ interface EditModalProps {
   onSave: (id: string, values: EditFormValues) => Promise<void>;
 }
 
-type Draft = Omit<EditFormValues, 'year'> & { year: string };
+type Draft = Omit<EditFormValues, 'year'> & { year: string; note: string };
 
 const EMPTY_DRAFT: Draft = {
   title: '',
@@ -23,6 +23,7 @@ const EMPTY_DRAFT: Draft = {
     sciHub: '',
   },
   abstract: '',
+  note: '',
 };
 
 export const EditModal: React.FC<EditModalProps> = ({ paper, onClose, onSave }) => {
@@ -39,6 +40,7 @@ export const EditModal: React.FC<EditModalProps> = ({ paper, onClose, onSave }) 
         doi: paper.doi,
         urls: paper.urls,
         abstract: paper.abstract,
+        note: paper.note ?? '',
       });
     }
   }, [paper]);
@@ -79,6 +81,7 @@ export const EditModal: React.FC<EditModalProps> = ({ paper, onClose, onSave }) 
         arxiv: draft.urls.arxiv || undefined,
         sciHub: draft.urls.sciHub || undefined,
       },
+      note: draft.note.trim() || undefined,
     };
 
     if (paper) {
@@ -193,6 +196,16 @@ export const EditModal: React.FC<EditModalProps> = ({ paper, onClose, onSave }) 
               value={draft.abstract}
               onChange={(e) => set('abstract', e.target.value)}
               placeholder="Paper abstract"
+            />
+          </div>
+
+          <div className="mfield">
+            <div className="mlabel">Note</div>
+            <textarea
+              className="note-modal-textarea"
+              value={draft.note}
+              onChange={(e) => set('note', e.target.value as Draft['note'])}
+              placeholder="Personal notes about this paper…"
             />
           </div>
 

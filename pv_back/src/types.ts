@@ -17,4 +17,5 @@ export interface Paper {
   issue?: string;
   pages?: string;
   publicationType?: "article" | "inproceedings" | "misc";
+  note?: string;
 }
