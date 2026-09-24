@@ -284,7 +284,8 @@
   border-color: var(--border1);
 }
 
-.paper-card:hover .card-actions {
+.paper-card:hover .card-actions,
+.web-card:hover .card-actions {
   opacity: 1;
 }
 

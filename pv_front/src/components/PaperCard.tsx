@@ -33,15 +33,14 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   const [isDeleted, setIsDeleted] = useState<boolean>(false);
   const modifyLock = isEdited || isDeleted;
 
-  const [fetchingBibtex, setFetchingBibtex] = useState<boolean>(false);
   const [copiedBibtex, setCopiedBibtex] = useState<boolean>(false);
-  const copyBibtexLock = fetchingBibtex || copiedBibtex;
 
   const [fetchingBibtexShow, setFetchingBibtexShow] = useState<boolean>(false);
   const [bibtexModal, setBibtexModal] = useState<{ open: boolean; content: string }>({
     open: false,
     content: '',
   });
+  const [copiedBibtexModal, setCopiedBibtexModal] = useState<boolean>(false);
 
   const handleEdit = async () => {
     setIsEdited(true);
@@ -56,20 +55,16 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   };
 
   const handleCopyBibtex = () => {
-    setFetchingBibtex(true);
-
     try {
       const s = axios
         .get<{ bibtex: string }>(`${SERVER_HOST}/papers/${paper.id}/bibtex`)
         .then((res) => res.data.bibtex);
       copyToClipboard(s);
-      setTimeout(() => setCopiedBibtex(true), 300);
+      setCopiedBibtex(true);
       setTimeout(() => setCopiedBibtex(false), 1500);
     } catch (err: any) {
       console.error('Error fetching BibTeX:', err);
       toast.error(`Error fetching BibTeX: ${err.response?.data.message || err}`);
-    } finally {
-      setTimeout(() => setFetchingBibtex(false), 500);
     }
   };
 
@@ -88,6 +83,8 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
   const handleModalCopy = () => {
     copyToClipboard(Promise.resolve(bibtexModal.content));
+    setCopiedBibtexModal(true);
+    setTimeout(() => setCopiedBibtexModal(false), 1500);
   };
 
   const handleModalClose = () => setBibtexModal((prev) => ({ ...prev, open: false }));
@@ -111,8 +108,8 @@ export const PaperCard: React.FC<PaperCardProps> = ({
           >
             {fetchingBibtexShow ? 'Loading...' : 'Show BibTeX'}
           </button>
-          <button disabled={copyBibtexLock} onClick={handleCopyBibtex} className="act-btn bibtex">
-            {fetchingBibtex ? 'Generating...' : copiedBibtex ? '✓ Copied' : 'Copy BibTeX'}
+          <button disabled={copiedBibtex} onClick={handleCopyBibtex} className="act-btn bibtex">
+            {copiedBibtex ? '✓ Copied' : 'Copy BibTeX'}
           </button>
           <button className="act-btn" onClick={handleEdit}>
             {isEdited ? 'Editing...' : 'Edit'}
@@ -151,8 +148,13 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             <button className="btn-cancel" type="button" onClick={handleModalClose}>
               Close
             </button>
-            <button className="btn-save" type="button" onClick={handleModalCopy}>
-              Copy
+            <button
+              disabled={copiedBibtexModal}
+              className="btn-save"
+              type="button"
+              onClick={handleModalCopy}
+            >
+              {copiedBibtexModal ? '✓ Copied' : 'Copy'}
             </button>
           </div>
         </div>
