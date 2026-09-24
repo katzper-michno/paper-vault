@@ -65,6 +65,10 @@ const mergeEnhanceAndFilterResults = (oa: Paper[], ss: Paper[]) => {
       ? {
           ...paper,
           abstract: Boolean(paper.abstract) ? paper.abstract : oaEntry.abstract, // For some reason, sometimes SS returns no abstract
+          volume: paper.volume ?? oaEntry.volume,
+          issue: paper.issue ?? oaEntry.issue,
+          pages: paper.pages ?? oaEntry.pages,
+          publicationType: paper.publicationType ?? oaEntry.publicationType,
           urls: {
             ...paper.urls,
             openAlex: oaEntry.urls.openAlex,

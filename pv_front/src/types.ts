@@ -18,6 +18,10 @@ export interface EditFormValues {
 export interface WebPaper extends EditFormValues {
   id: string;
   saved: boolean;
+  volume?: string;
+  issue?: string;
+  pages?: string;
+  publicationType?: "article" | "inproceedings" | "misc";
 }
 
 export interface Paper extends WebPaper {

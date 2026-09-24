@@ -13,4 +13,8 @@ export interface Paper {
   };
   doi: string;
   files?: string[];
+  volume?: string;
+  issue?: string;
+  pages?: string;
+  publicationType?: "article" | "inproceedings" | "misc";
 }

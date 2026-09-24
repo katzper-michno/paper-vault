@@ -20,6 +20,12 @@ interface SemanticScholarWork {
   openAccessPdf?: {
     url?: string;
   };
+  publicationTypes?: string[];
+  journal?: {
+    name?: string;
+    volume?: string;
+    pages?: string;
+  };
 }
 
 interface SemanticScholarResponse {
@@ -28,6 +34,16 @@ interface SemanticScholarResponse {
   next: number;
   data: SemanticScholarWork[];
 }
+
+const mapPublicationType = (
+  types: string[] | undefined,
+): Paper["publicationType"] => {
+  if (!types || types.length === 0) return undefined;
+  if (types.includes("JournalArticle")) return "article";
+  if (types.includes("Conference")) return "inproceedings";
+  if (types.includes("Preprint")) return "misc";
+  return undefined;
+};
 
 export class SemanticScholarError extends Error {
   constructor(
@@ -48,7 +64,7 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
     "https://api.semanticscholar.org/graph/v1/paper/search" +
     `?query=${encodeURIComponent(searchTerm)}` +
     "&limit=10" +
-    "&fields=title,authors,year,venue,abstract,externalIds,url,openAccessPdf";
+    "&fields=title,authors,year,venue,abstract,externalIds,url,openAccessPdf,journal,publicationTypes";
 
   const headers = API_KEY ? { "x-api-key": API_KEY } : {};
 
@@ -96,11 +112,14 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
         authors: work.authors.map((auth: any) => auth.name),
         abstract: work.abstract || "",
         year: work.year,
-        venue: work.venue || "",
+        venue: work.journal?.name || work.venue || "",
         doi: doi!,
         urls: {
           semanticScholar: work.url,
         },
+        volume: work.journal?.volume,
+        pages: work.journal?.pages,
+        publicationType: mapPublicationType(work.publicationTypes),
       };
     });
 };

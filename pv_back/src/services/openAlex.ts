@@ -15,6 +15,13 @@ interface OpenAlexWork {
     raw_source_name?: string;
   };
   doi?: string;
+  type?: string;
+  biblio?: {
+    volume?: string;
+    issue?: string;
+    first_page?: string;
+    last_page?: string;
+  };
 }
 
 interface OpenAlexResponse {
@@ -23,6 +30,14 @@ interface OpenAlexResponse {
   };
   results: OpenAlexWork[];
 }
+
+const mapOAType = (type: string | undefined): Paper["publicationType"] => {
+  if (!type) return undefined;
+  if (type === "journal-article") return "article";
+  if (type === "proceedings-article") return "inproceedings";
+  if (type === "preprint") return "misc";
+  return undefined;
+};
 
 function reconstructAbstract(
   invertedIndex: Record<string, number[]> | null,
@@ -71,6 +86,11 @@ export async function searchPapers(query: string): Promise<Paper[]> {
           : work.doi!
       ).toLowerCase();
 
+      const pages =
+        work.biblio?.first_page && work.biblio?.last_page
+          ? `${work.biblio.first_page}--${work.biblio.last_page}`
+          : work.biblio?.first_page;
+
       return {
         id: VaultService.convertDOIToId(doi),
         title: work.title,
@@ -82,6 +102,10 @@ export async function searchPapers(query: string): Promise<Paper[]> {
         urls: {
           openAlex: work.id,
         },
+        volume: work.biblio?.volume,
+        issue: work.biblio?.issue,
+        pages,
+        publicationType: mapOAType(work.type),
       };
     });
 }
