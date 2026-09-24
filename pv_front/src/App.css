@@ -981,8 +981,8 @@
   background: var(--note-bg);
   border: 0.5px solid var(--note-bd);
   border-radius: 8px;
-  padding: 8px 10px;
-  margin-bottom: 5px;
+  padding: 2px 8px;
+  margin: 10px 0 5px 0;
 }
 
 .note-text {
