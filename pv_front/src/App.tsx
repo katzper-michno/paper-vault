@@ -23,7 +23,8 @@ const useTheme = () => {
   return { theme, setTheme };
 };
 
-const WEB_COL_DEFAULT_WIDTH = 420;
+const SIDEBAR_WIDTH = 44;
+const defaultWebColWidth = () => Math.round((window.innerWidth - SIDEBAR_WIDTH) * 0.4);
 
 const App: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -32,7 +33,7 @@ const App: React.FC = () => {
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
 
   const [panelOpen, setPanelOpen] = useState(false);
-  const [webColWidth, setWebColWidth] = useState(WEB_COL_DEFAULT_WIDTH);
+  const [webColWidth, setWebColWidth] = useState(defaultWebColWidth);
   const mainRef = useRef<HTMLDivElement>(null);
   const webColRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
