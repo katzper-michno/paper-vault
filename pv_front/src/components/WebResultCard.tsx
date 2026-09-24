@@ -63,7 +63,7 @@ export const WebResultCard: React.FC<WebResultCardProps> = ({ paper, isSaved, on
       </div>
 
       <div className="paper-meta">
-        <span className="tag venue">{paper.venue}</span>
+        <span className="tag venue">{paper.venue || "N/A"}</span>
         <span className="tag">{paper.year}</span>
       </div>
 
