@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Paper } from '../types';
 import { ExtLinks, DoiRow, Abstract, HighlightedText, trimToLimit } from './PaperMeta';
 import axios from 'axios';
@@ -48,6 +48,36 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   const [editingNote, setEditingNote] = useState<boolean>(false);
   const [noteDraft, setNoteDraft] = useState<string>('');
   const [noteUserExpanded, setNoteUserExpanded] = useState<boolean>(false);
+
+  const [dragOver, setDragOver] = useState(false);
+  const dragCounter = useRef(0);
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
+    dragCounter.current++;
+    setDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    dragCounter.current--;
+    if (dragCounter.current === 0) setDragOver(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    dragCounter.current = 0;
+    setDragOver(false);
+    const files = Array.from(e.dataTransfer.files);
+    for (const file of files) {
+      await onAddFile(paper.id, file);
+    }
+  };
 
   // ── Note collapse/expand logic (mirrors Abstract) ──────────────────────
   const noteText = paper.note ?? '';
@@ -124,7 +154,14 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   };
 
   return (
-    <div className="paper-card">
+    <div
+      className={`paper-card${dragOver ? ' drag-over' : ''}`}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      {dragOver && <div className="drop-overlay">Drop to attach</div>}
       {/* ── Header row ── */}
       <div className="card-top">
         <div className="card-main">
@@ -157,7 +194,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
       {/* ── Tags ── */}
       <div className="paper-meta">
-        <span className="tag venue">{paper.venue}</span>
+        <span className="tag venue">{paper.venue || "N/A"}</span>
         <span className="tag">{paper.year}</span>
       </div>
 

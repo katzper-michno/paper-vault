@@ -321,6 +321,7 @@
 
 /* ── Paper card ── */
 .paper-card {
+  position: relative;
   background: var(--bg0);
   border: 0.5px solid var(--border0);
   border-radius: 12px;
@@ -330,6 +331,26 @@
 
 .paper-card:hover {
   border-color: var(--border1);
+}
+
+.paper-card.drag-over {
+  border-color: var(--blue-bd);
+}
+
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: var(--blue-bg);
+  opacity: 0.55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue-tx);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .paper-card:hover .card-actions,
@@ -530,119 +551,107 @@
   margin-top: 8px;
   border-top: 0.5px solid var(--border0);
   padding-top: 7px;
-}
-
-.files-row {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
 }
 
-.files-toggle {
-  display: inline-flex;
-  align-items: center;
+.files-actions {
+  display: flex;
+  flex-direction: row;
   gap: 4px;
-  cursor: pointer;
-  font-size: 11px;
-  color: var(--text2);
-  background: none;
-  border: none;
-  padding: 0;
-  transition: color 0.1s;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
 }
 
-.files-toggle:hover {
-  color: var(--text1);
+.paper-card:hover .files-actions {
+  opacity: 1;
 }
 
-.arrow {
-  font-size: 10px;
-  transition: transform 0.15s;
-  display: inline-block;
-}
-
-.arrow.open {
-  transform: rotate(90deg);
-}
-
-.act-files-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 11px;
-  padding: 1px 7px;
-  border: 0.5px solid var(--border1);
-  border-radius: 6px;
-  background: var(--bg2);
-  color: var(--text2);
-  cursor: pointer;
-  transition: all 0.12s;
-}
-
-.act-files-btn:hover {
-  border-color: var(--border2);
-  color: var(--text0);
-}
-
-.act-files-btn.attach:hover {
-  background: var(--saved-bg);
-  border-color: var(--saved-bd);
-  color: var(--saved-tx);
-}
-
-.files-list {
-  margin-top: 6px;
+.files-mosaic {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
-.file-item {
+.file-tile {
+  position: relative;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 6px;
-  padding: 4px 7px;
+  gap: 5px;
+  max-width: 130px;
+  min-width: 60px;
+  border: 0.5px solid var(--border0);
   border-radius: 6px;
   background: var(--bg1);
-  border: 0.5px solid var(--border0);
+  cursor: pointer;
+  padding: 3px 22px 3px 6px;
+  transition: border-color 0.12s, opacity 0.15s;
+  overflow: hidden;
 }
 
-.file-icon {
-  font-size: 11px;
+.file-tile:hover {
+  border-color: var(--border2);
+}
+
+.file-tile.busy {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.file-tile-ext {
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff;
+  padding: 1px 3px;
+  border-radius: 3px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
   flex-shrink: 0;
-  color: var(--text2);
 }
 
-.file-name {
-  font-size: 11px;
-  color: var(--text0);
-  flex: 1;
+.file-tile-name {
+  font-size: 10px;
+  color: var(--text1);
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.4;
 }
 
-.act-file-btn {
-  font-size: 10px;
-  color: var(--text2);
+.file-tile-del {
+  position: absolute;
+  top: 50%;
+  right: 3px;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg2);
+  color: var(--text1);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  padding: 1px 5px;
-  border-radius: 4px;
-  border: 0.5px solid var(--border1);
-  background: var(--bg0);
-  transition: all 0.12s;
+  opacity: 0;
+  transition: opacity 0.12s, background 0.1s;
+  padding: 0;
+  line-height: 1;
 }
 
-.act-file-btn.open:hover {
-  border-color: var(--border2);
-  color: var(--text0);
+.file-tile:hover .file-tile-del {
+  opacity: 1;
 }
 
-.act-file-btn.del:hover {
+.file-tile-del:hover {
   background: var(--del-h-bg);
-  border-color: var(--del-h-bd);
   color: var(--del-h-tx);
 }
 
