@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, FormEvent } from 'react';
 import { Paper, EditFormValues, WebPaper } from './types.ts';
 import { EditModal } from './components/EditModal';
 
@@ -23,6 +23,8 @@ const useTheme = () => {
   return { theme, setTheme };
 };
 
+const WEB_COL_DEFAULT_WIDTH = 420;
+
 const App: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
@@ -30,6 +32,41 @@ const App: React.FC = () => {
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
 
   const [panelOpen, setPanelOpen] = useState(false);
+  const [webColWidth, setWebColWidth] = useState(WEB_COL_DEFAULT_WIDTH);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const webColRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ startX: number; startWidth: number } | null>(null);
+
+  const handleResizeMouseDown = (e: React.MouseEvent) => {
+    if (!panelOpen) return;
+    e.preventDefault();
+    dragRef.current = { startX: e.clientX, startWidth: webColWidth };
+    if (webColRef.current) webColRef.current.style.transition = 'none';
+    mainRef.current?.classList.add('resizing');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    const onMove = (ev: MouseEvent) => {
+      if (!dragRef.current || !mainRef.current) return;
+      const delta = dragRef.current.startX - ev.clientX;
+      const next = Math.max(240, Math.min(dragRef.current.startWidth + delta, window.innerWidth * 0.72));
+      mainRef.current.style.setProperty('--web-col-width', `${next}px`);
+      setWebColWidth(next);
+    };
+
+    const onUp = () => {
+      dragRef.current = null;
+      if (webColRef.current) webColRef.current.style.transition = '';
+      mainRef.current?.classList.remove('resizing');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  };
 
   const [editingPaper, setEditingPaper] = useState<Paper | null>(null);
   const editingPromise = useRef<{ promise?: Promise<void>; resolve?: () => void }>({});
@@ -40,6 +77,32 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const savedIds: Set<string> = new Set(savedPapers.map((p: Paper) => p.id));
+
+  const [webQuery, setWebQuery] = useState('');
+  const [webResults, setWebResults] = useState<WebPaper[]>([]);
+  const [webSearching, setWebSearching] = useState(false);
+
+  useEffect(() => {
+    setWebResults((prev) => prev.map((p) => ({ ...p, saved: savedIds.has(p.id) })));
+  }, [savedIds]);
+
+  const handleWebSearch = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!webQuery.trim()) return;
+    setWebSearching(true);
+    try {
+      const res = await axios.get<WebPaper[]>(
+        `${SERVER_HOST}/search?q=${encodeURIComponent(webQuery)}`
+      );
+      setWebResults(res.data);
+    } catch (err: any) {
+      console.error(err);
+      setWebResults([]);
+      toast.error(`Error searching papers: ${err.response?.data.message || err}`);
+    } finally {
+      setWebSearching(false);
+    }
+  };
 
   useEffect(() => {
     fetchSavedPapers();
@@ -212,19 +275,13 @@ const App: React.FC = () => {
   return (
     <div id="root" className={theme === 'dark' ? 'dark' : ''}>
       <div className="app">
-        {/* ── Topbar ── */}
-        <div className="topbar">
-          <div className="search-wrap">
-            <span className="search-icon">⌕</span>
-            <input
-              type="text"
-              placeholder="Search your vault…"
-              value={libraryQuery}
-              onChange={(e) => setLibraryQuery(e.target.value)}
-            />
-          </div>
-
-          <div className="topbar-right">
+        <div
+          ref={mainRef}
+          className={`main${panelOpen ? ' panel-open' : ''}`}
+          style={{ '--web-col-width': `${webColWidth}px` } as React.CSSProperties}
+        >
+          {/* ── Sidebar ── */}
+          <div className="sidebar">
             <button
               className="icon-btn"
               onClick={() =>
@@ -246,27 +303,17 @@ const App: React.FC = () => {
             <button className="icon-btn" onClick={toggleTheme} title="Toggle light/dark mode">
               {theme === 'dark' ? '☽' : '☀'}
             </button>
-            <button
-              disabled={loading}
-              className={`web-toggle${panelOpen ? ' active' : ''}`}
-              onClick={() => setPanelOpen((o) => !o)}
-            >
-              <span className="dot" />
-              <span>{panelOpen ? 'Hide web search' : 'Web search'}</span>
-              <span
-                className="toggle-arrow"
-                style={{ transform: panelOpen ? 'rotate(180deg)' : '' }}
-              >
-                ›
-              </span>
-            </button>
           </div>
-        </div>
 
-        <div className="main">
+          {/* ── Vault column ── */}
           <VaultPanel
             savedPapers={loading ? undefined : savedPapers}
+            searchQuery={libraryQuery}
+            onSearchChange={setLibraryQuery}
             filterQuery={libraryQuery.toLowerCase()}
+            webPanelOpen={panelOpen}
+            webLoading={loading}
+            onWebToggle={() => setPanelOpen((o) => !o)}
             onDelete={handleRemove}
             onEdit={handleEdit}
             onUpdateNote={handleUpdateNote}
@@ -276,10 +323,30 @@ const App: React.FC = () => {
             onOpenFile={handleOpenFile}
           />
 
-          {/* Divider */}
-          <div className={`divider${panelOpen ? ' visible' : ''}`} />
-
-          <WebSearchPanel isOpen={!loading && panelOpen} savedIds={savedIds} onSave={handleSave} />
+          {/* ── Web search column ── */}
+          <div
+            ref={webColRef}
+            className={`web-column${panelOpen ? ' open' : ''}`}
+            style={{ width: webColWidth }}
+          >
+            <div className="web-col-resize-handle" onMouseDown={handleResizeMouseDown} />
+            <div className="web-col-body">
+              <div className="web-search-bar">
+                <form onSubmit={handleWebSearch} className="web-input-wrap">
+                  <input
+                    type="text"
+                    placeholder="Search for a paper online…"
+                    value={webQuery}
+                    onChange={(e) => setWebQuery(e.target.value)}
+                  />
+                  <button type="submit" disabled={webSearching} className="go-btn">
+                    {webSearching ? 'Searching...' : 'Search'}
+                  </button>
+                </form>
+              </div>
+              <WebSearchPanel results={webResults} savedIds={savedIds} onSave={handleSave} />
+            </div>
+          </div>
         </div>
       </div>
 

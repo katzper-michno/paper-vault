@@ -3,7 +3,12 @@ import { PaperCard } from './PaperCard';
 
 interface VaultPanelProps {
   savedPapers?: undefined | Paper[];
+  searchQuery: string;
+  onSearchChange: (q: string) => void;
   filterQuery: string;
+  webPanelOpen: boolean;
+  webLoading: boolean;
+  onWebToggle: () => void;
   onEdit: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onUpdateNote: (id: string, note: string | undefined) => Promise<void>;
@@ -15,7 +20,12 @@ interface VaultPanelProps {
 
 export const VaultPanel: React.FC<VaultPanelProps> = ({
   savedPapers,
+  searchQuery,
+  onSearchChange,
   filterQuery,
+  webPanelOpen,
+  webLoading,
+  onWebToggle,
   onEdit,
   onDelete,
   onUpdateNote,
@@ -36,6 +46,31 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
 
   return (
     <div className="db-panel">
+      <div className="db-search-wrap">
+        <div className="db-search-input-wrap">
+          <span className="search-icon">⌕</span>
+          <input
+            type="text"
+            placeholder="Search your vault…"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
+        </div>
+        <button
+          disabled={webLoading}
+          className={`web-toggle-btn${webPanelOpen ? ' active' : ''}`}
+          onClick={onWebToggle}
+        >
+          <span className="dot" />
+          <span>Web search</span>
+          <span
+            className="toggle-arrow"
+            style={{ transform: webPanelOpen ? 'rotate(180deg)' : '' }}
+          >
+            ›
+          </span>
+        </button>
+      </div>
       <div className="db-list">
         {filteredSavedPapers.reverse().map((p) => (
           <PaperCard
