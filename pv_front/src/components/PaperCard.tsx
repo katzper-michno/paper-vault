@@ -141,7 +141,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             onClick={handleShowBibtex}
             className="act-btn bibtex"
           >
-            {fetchingBibtexShow ? 'Loading...' : 'Show BibTeX'}
+            {'Show BibTeX'}
           </button>
           <button disabled={copiedBibtex} onClick={handleCopyBibtex} className="act-btn bibtex">
             {copiedBibtex ? '✓ Copied' : 'Copy BibTeX'}
