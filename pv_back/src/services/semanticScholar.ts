@@ -85,7 +85,10 @@ const mapWork = (work: SemanticScholarWork): Paper => {
   };
 };
 
-const searchPapers = async (query: string): Promise<Paper[]> => {
+const searchPapers = async (
+  query: string,
+  offset: number = 0,
+): Promise<Paper[]> => {
   const API_KEY = process.env.SEMANTIC_SCHOLAR_API_KEY;
 
   const searchTerm = query.toLowerCase();
@@ -95,6 +98,7 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
     "https://api.semanticscholar.org/graph/v1/paper/search" +
     `?query=${encodeURIComponent(searchTerm)}` +
     "&limit=10" +
+    `&offset=${offset}` +
     `&fields=${SEARCH_FIELDS}`;
 
   const headers = API_KEY ? { "x-api-key": API_KEY } : {};

@@ -86,26 +86,61 @@ const App: React.FC = () => {
   const [webQuery, setWebQuery] = useState('');
   const [webResults, setWebResults] = useState<WebPaper[]>([]);
   const [webSearching, setWebSearching] = useState(false);
+  const [webLoadingMore, setWebLoadingMore] = useState(false);
+  const [webPage, setWebPage] = useState(1);
+  const [webHasMore, setWebHasMore] = useState(false);
 
   useEffect(() => {
     setWebResults((prev) => prev.map((p) => ({ ...p, saved: savedIds.has(p.id) })));
   }, [savedIds]);
+
+  interface SearchResponse {
+    results: WebPaper[];
+    hasMore: boolean;
+  }
 
   const handleWebSearch = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!webQuery.trim()) return;
     setWebSearching(true);
     try {
-      const res = await axios.get<WebPaper[]>(
-        `${SERVER_HOST}/search?q=${encodeURIComponent(webQuery)}`
+      const res = await axios.get<SearchResponse>(
+        `${SERVER_HOST}/search?q=${encodeURIComponent(webQuery)}&page=1`
       );
-      setWebResults(res.data);
+      setWebResults(res.data.results);
+      setWebHasMore(res.data.hasMore);
+      setWebPage(1);
     } catch (err: any) {
       console.error(err);
       setWebResults([]);
+      setWebHasMore(false);
       toast.error(`Error searching papers: ${err.response?.data.message || err}`);
     } finally {
       setWebSearching(false);
+    }
+  };
+
+  const handleLoadMoreWebResults = async () => {
+    if (webSearching || webLoadingMore || !webHasMore || !webQuery.trim()) return;
+
+    const nextPage = webPage + 1;
+    setWebLoadingMore(true);
+    try {
+      const res = await axios.get<SearchResponse>(
+        `${SERVER_HOST}/search?q=${encodeURIComponent(webQuery)}&page=${nextPage}`
+      );
+      setWebResults((prev) => {
+        const existingIds = new Set(prev.map((p) => p.id));
+        return [...prev, ...res.data.results.filter((p) => !existingIds.has(p.id))];
+      });
+      setWebHasMore(res.data.hasMore);
+      setWebPage(nextPage);
+    } catch (err: any) {
+      console.error(err);
+      setWebHasMore(false);
+      toast.error(`Error loading more results: ${err.response?.data.message || err}`);
+    } finally {
+      setWebLoadingMore(false);
     }
   };
 
@@ -352,7 +387,15 @@ const App: React.FC = () => {
                   </button>
                 </form>
               </div>
-              <WebSearchPanel results={webResults} savedIds={savedIds} onSave={handleSave} />
+              <WebSearchPanel
+                results={webResults}
+                savedIds={savedIds}
+                onSave={handleSave}
+                searching={webSearching}
+                loadingMore={webLoadingMore}
+                hasMore={webHasMore}
+                onLoadMore={handleLoadMoreWebResults}
+              />
             </div>
           </div>
         </div>

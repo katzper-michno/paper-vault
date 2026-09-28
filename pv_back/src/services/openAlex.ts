@@ -89,13 +89,17 @@ const mapWork = (work: OpenAlexWork): Paper => {
   };
 };
 
-export async function searchPapers(query: string): Promise<Paper[]> {
+export async function searchPapers(
+  query: string,
+  page: number = 1,
+): Promise<Paper[]> {
   const API_KEY = process.env.OPEN_ALEX_API_KEY;
 
   const url =
     "https://api.openalex.org/works?" +
     `search=${encodeURIComponent(query)}` +
     "&per-page=10" +
+    `&page=${page}` +
     "&include_xpac=true" +
     (API_KEY ? `&api_key=${API_KEY}` : "");
 

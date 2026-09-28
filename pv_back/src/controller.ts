@@ -98,21 +98,28 @@ const interleaveResults = (oa: Paper[], ss: Paper[]) =>
     .flatMap((_, i) => [oa[i], ss[i]])
     .filter((x) => x !== undefined);
 
+interface SearchResponse {
+  results: Paper[];
+  hasMore: boolean;
+}
+
 const search = async (
-  req: Request<{}, {}, {}, { q: string }>,
-  res: Response<Paper[] | { message: string }>,
+  req: Request<{}, {}, {}, { q: string; page?: string }>,
+  res: Response<SearchResponse | { message: string }>,
 ) => {
-  const { q } = req.query;
+  const { q, page: rawPage } = req.query;
 
   if (!q) {
     return res.status(400).json({ message: 'Query parameter "q" is required' });
   }
 
   const searchQuery = q.trim().toLowerCase();
+  const page = Math.max(1, Number(rawPage) || 1);
+  const offset = (page - 1) * 10;
 
   let openAlexResults: Paper[] = [];
   try {
-    openAlexResults = await OpenAlexClient.searchPapers(searchQuery);
+    openAlexResults = await OpenAlexClient.searchPapers(searchQuery, page);
   } catch (error: any) {
     console.log(
       "[Controller] Error when searching for papers on OpenAlex:",
@@ -122,14 +129,18 @@ const search = async (
 
   let semanticScholarResults: Paper[] = [];
   try {
-    semanticScholarResults =
-      await SemanticScholarClient.searchPapers(searchQuery);
+    semanticScholarResults = await SemanticScholarClient.searchPapers(
+      searchQuery,
+      offset,
+    );
   } catch (error: any) {
     console.log(
       "[Controller] Error when searching for papers on semantic scholar:",
       error,
     );
   }
+
+  const hasMore = openAlexResults.length > 0 || semanticScholarResults.length > 0;
 
   const searchResults = mergeEnhanceAndFilterResults(
     openAlexResults,
@@ -151,7 +162,7 @@ const search = async (
     console.log("[Controller] Resolved urls:");
     printUrlResolutionTable(resultsWithLinks);
 
-    res.status(200).json(resultsWithLinks);
+    res.status(200).json({ results: resultsWithLinks, hasMore });
   } catch (error: any) {
     console.log("[Controller] Error when searching for papers:", error);
     res.status(500).json({ message: "Internal server error" });

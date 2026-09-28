@@ -817,6 +817,46 @@
   display: none;
 }
 
+/* ── Loading indicators ── */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border1);
+  border-top-color: var(--text1);
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.spinner-sm {
+  width: 13px;
+  height: 13px;
+  border-width: 1.5px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.web-loading-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  padding: 40px 20px;
+}
+
+.web-loading-more {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+}
+
 /* ── Web result card ── */
 .web-card {
   background: var(--bg1);
