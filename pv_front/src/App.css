@@ -1379,3 +1379,25 @@
 .bibtex-textarea:focus {
   border-color: var(--border2);
 }
+
+/* ── Undo-delete toast ── */
+.toast-undo-btn {
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.18);
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.toast-undo-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.toast-hint {
+  opacity: 0.75;
+  font-size: 11px;
+}

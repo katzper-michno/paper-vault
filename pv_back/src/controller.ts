@@ -372,6 +372,22 @@ const deletePaper = async (
   }
 };
 
+const undoDelete = async (
+  req: Request,
+  res: Response<Paper | { message: string }>,
+) => {
+  try {
+    const restored = VaultService.restoreLastDeleted();
+    res.status(200).json(restored);
+  } catch (error: any) {
+    if (error.message === "Nothing to restore") {
+      return res.status(404).json({ message: error.message });
+    }
+    console.log("[Controller] Error when restoring last deleted paper:", error);
+    res.status(409).json({ message: error.message || "Could not restore paper" });
+  }
+};
+
 const generateBibTeX = async (
   req: Request<{ id: string }>,
   res: Response<{ bibtex: string } | { message: string }>,
@@ -475,6 +491,7 @@ export const Controller = {
   addPaper,
   updatePaper,
   deletePaper,
+  undoDelete,
   generateBibTeX,
   addFile,
   deleteFile,

@@ -5,6 +5,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  renameSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -20,6 +21,13 @@ const vaultPath = (): string => {
 const vaultMetaPath = (): string => path.join(vaultPath(), "vault.json");
 
 const vaultFilesPath = (): string => path.join(vaultPath(), "files");
+
+const vaultTrashPath = (): string => path.join(vaultPath(), ".trash");
+
+// Holds the most recently deleted paper (metadata + its moved-aside files
+// directory) so it can be restored with a single undo. Only one level of
+// undo is kept, and it does not survive a server restart.
+let lastDeleted: { paper: Paper; trashDir: string } | null = null;
 
 const vaultMeta = (): Paper[] =>
   JSON.parse(readFileSync(vaultMetaPath(), "utf-8")) as Paper[];
@@ -82,11 +90,52 @@ const updatePaper = (paper: Paper) => {
 
 const deletePaper = (id: string) => {
   const papers = getPapers();
-  if (!papers.some((p: Paper) => p.id === id)) {
+  const paper = papers.find((p: Paper) => p.id === id);
+  if (!paper) {
     throw new Error(`Paper with id ${id} not found`);
   }
+
   savePapers(papers.filter((p: Paper) => p.id !== id));
-  rmSync(path.join(vaultFilesPath(), id), { recursive: true, force: true });
+
+  // Only the most recent delete can be undone, so whatever was trashed
+  // before this is now permanently discarded.
+  if (lastDeleted) {
+    rmSync(lastDeleted.trashDir, { recursive: true, force: true });
+  }
+
+  const filesDir = path.join(vaultFilesPath(), id);
+  const trashDir = path.join(vaultTrashPath(), id);
+  rmSync(trashDir, { recursive: true, force: true });
+  if (existsSync(filesDir)) {
+    mkdirSync(vaultTrashPath(), { recursive: true });
+    renameSync(filesDir, trashDir);
+  }
+
+  lastDeleted = { paper: sanitizeToSave({ ...paper }), trashDir };
+};
+
+const getLastDeleted = (): Paper | null => lastDeleted?.paper ?? null;
+
+const restoreLastDeleted = (): Paper => {
+  if (!lastDeleted) {
+    throw new Error("Nothing to restore");
+  }
+
+  const { paper, trashDir } = lastDeleted;
+
+  const papers = getPapers();
+  if (papers.some((p: Paper) => p.id === paper.id)) {
+    throw new Error(`A paper with id ${paper.id} already exists`);
+  }
+
+  if (existsSync(trashDir)) {
+    renameSync(trashDir, path.join(vaultFilesPath(), paper.id));
+  }
+
+  savePapers([...papers, paper]);
+  lastDeleted = null;
+
+  return populateWithFiles(paper);
 };
 
 // Resolves a file name against a paper's files directory, rejecting any
@@ -128,6 +177,8 @@ export const VaultService = {
   addPaper,
   updatePaper,
   deletePaper,
+  getLastDeleted,
+  restoreLastDeleted,
   addFile,
   deleteFile,
   getFilePath,

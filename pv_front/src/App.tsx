@@ -208,15 +208,55 @@ const App: React.FC = () => {
     }
   };
 
+  const handleUndoDelete = async (): Promise<void> => {
+    try {
+      const res = await axios.post<Paper>(`${SERVER_HOST}/papers/undo-delete`);
+      setSavedPapers((prev) => [...prev, res.data]);
+      toast.success(`Restored "${res.data.title}"`);
+    } catch (err: any) {
+      if (err.response?.status === 404) return; // nothing to restore
+      console.error('Error restoring paper:', err);
+      toast.error(`Error restoring paper: ${err.response?.data.message || err}`);
+    }
+  };
+
   const handleRemove = async (id: string): Promise<void> => {
+    const removedPaper = savedPapers.find((p) => p.id === id);
     try {
       await axios.delete(`${SERVER_HOST}/papers/${id}`);
       setSavedPapers((prev) => prev.filter((p) => p.id !== id));
+      toast.success(
+        <span>
+          Removed "{removedPaper?.title ?? 'paper'}".{' '}
+          <button className="toast-undo-btn" onClick={() => handleUndoDelete()}>
+            Undo
+          </button>{' '}
+          <span className="toast-hint">(Ctrl+Z)</span>
+        </span>
+      );
     } catch (err: any) {
       console.error('Error deleting paper:', err);
       toast.error(`Error deleting paper ${err.response?.data.message || err}`);
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (readOnly) return;
+      if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.key.toLowerCase() !== 'z') return;
+
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const isEditingText = tag === 'INPUT' || tag === 'TEXTAREA' || target?.isContentEditable;
+      if (isEditingText) return;
+
+      e.preventDefault();
+      handleUndoDelete();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [readOnly]);
 
   const handleSave = async (paper: WebPaper): Promise<void> => {
     try {

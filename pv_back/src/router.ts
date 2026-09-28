@@ -26,6 +26,11 @@ router.get("/papers", Controller.getPapers);
 router.post("/papers", AuthService.requireAuth, Controller.addPaper);
 router.put("/papers/:id", AuthService.requireAuth, Controller.updatePaper);
 router.delete("/papers/:id", AuthService.requireAuth, Controller.deletePaper);
+router.post(
+  "/papers/undo-delete",
+  AuthService.requireAuth,
+  Controller.undoDelete,
+);
 
 // Generate BibTeX
 router.get("/papers/:id/bibtex", Controller.generateBibTeX);
