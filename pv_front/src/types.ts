@@ -3,6 +3,7 @@ export interface PaperUrls {
   semanticScholar?: string;
   arxiv?: string;
   sciHub?: string;
+  openAccessPdf?: string;
 }
 
 export type PublicationType = 'article' | 'inproceedings' | 'misc';

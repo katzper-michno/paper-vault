@@ -8,6 +8,7 @@ import { SciHubClient } from "./services/sciHub.js";
 import { OpenAlexClient } from "./services/openAlex.js";
 import { SemanticScholarClient } from "./services/semanticScholar.js";
 import { AuthService } from "./services/auth.js";
+import { DownloadService } from "./services/download.js";
 
 const healthcheck = async (_: Request, res: Response) => {
   res.status(200).json({ message: "PaperVault service is OK:)" });
@@ -294,21 +295,34 @@ const addPaper = async (
   try {
     VaultService.addPaper(paper);
 
-    try {
-      if (paper.urls.arxiv) {
+    // Each source is downloaded independently, so one failing (e.g. a dead
+    // link) doesn't prevent the others from being attached.
+    if (paper.urls.arxiv) {
+      try {
         const arxivPdf = await ArXivClient.downloadPdf(paper.doi);
         VaultService.addFile(paper.id, arxivPdf);
+      } catch (error: any) {
+        console.warn("[Controller] Error downloading arXiv pdf:", error);
       }
-      if (paper.urls.sciHub) {
+    }
+    if (paper.urls.sciHub) {
+      try {
         const sciHubPdf = await SciHubClient.downloadPdf(paper.doi);
         VaultService.addFile(paper.id, sciHubPdf);
+      } catch (error: any) {
+        console.warn("[Controller] Error downloading Sci-Hub pdf:", error);
       }
-    } catch (error: any) {
-      // We do not want the entire request to fail.
-      console.warn(
-        "[Controller] There was an error when downloading pdfs: ",
-        error,
-      );
+    }
+    if (paper.urls.openAccessPdf) {
+      try {
+        const openAccessPdf = await DownloadService.downloadAsFile(
+          paper.urls.openAccessPdf,
+          `open_access_${paper.id}.pdf`,
+        );
+        VaultService.addFile(paper.id, openAccessPdf);
+      } catch (error: any) {
+        console.warn("[Controller] Error downloading open-access pdf:", error);
+      }
     }
 
     res.status(201).json(VaultService.getPaper(paper.id));

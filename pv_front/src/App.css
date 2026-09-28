@@ -635,6 +635,12 @@
   color: var(--del-h-tx);
 }
 
+.ext-link.oapdf:hover {
+  background: var(--saved-bg);
+  border-color: var(--saved-bd);
+  color: var(--saved-tx);
+}
+
 /* DOI */
 .doi-row {
   font-size: 11px;

@@ -21,6 +21,7 @@ type Draft = {
     semanticScholar: string;
     arxiv: string;
     sciHub: string;
+    openAccessPdf: string;
   };
   volume: string;
   issue: string;
@@ -41,6 +42,7 @@ const EMPTY_DRAFT: Draft = {
     semanticScholar: '',
     arxiv: '',
     sciHub: '',
+    openAccessPdf: '',
   },
   volume: '',
   issue: '',
@@ -61,6 +63,7 @@ const draftFromPaper = (paper: Paper): Draft => ({
     semanticScholar: paper.urls.semanticScholar ?? '',
     arxiv: paper.urls.arxiv ?? '',
     sciHub: paper.urls.sciHub ?? '',
+    openAccessPdf: paper.urls.openAccessPdf ?? '',
   },
   volume: paper.volume ?? '',
   issue: paper.issue ?? '',
@@ -118,6 +121,7 @@ export const EditModal: React.FC<EditModalProps> = ({ open, paper, onClose, onSa
         semanticScholar: draft.urls.semanticScholar || undefined,
         arxiv: draft.urls.arxiv || undefined,
         sciHub: draft.urls.sciHub || undefined,
+        openAccessPdf: draft.urls.openAccessPdf || undefined,
       },
       volume: draft.volume || undefined,
       issue: draft.issue || undefined,
@@ -282,6 +286,15 @@ export const EditModal: React.FC<EditModalProps> = ({ open, paper, onClose, onSa
                 value={draft.urls.sciHub}
                 onChange={(e) => setUrl('sciHub', e.target.value)}
                 placeholder="sci-hub.pl/:sh_id"
+              />
+            </div>
+
+            <div className="mfield">
+              <div className="mlabel">Open Access PDF</div>
+              <input
+                value={draft.urls.openAccessPdf}
+                onChange={(e) => setUrl('openAccessPdf', e.target.value)}
+                placeholder="https://.../paper.pdf"
               />
             </div>
 

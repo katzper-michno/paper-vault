@@ -10,6 +10,7 @@ export interface Paper {
     semanticScholar?: string;
     arxiv?: string;
     sciHub?: string;
+    openAccessPdf?: string;
   };
   doi: string;
   files?: string[];

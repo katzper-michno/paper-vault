@@ -78,6 +78,7 @@ const mapWork = (work: SemanticScholarWork): Paper => {
     doi: doi!,
     urls: {
       semanticScholar: work.url,
+      openAccessPdf: work.openAccessPdf?.url,
     },
     volume: work.journal?.volume,
     pages: work.journal?.pages,

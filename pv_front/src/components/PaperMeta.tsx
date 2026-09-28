@@ -27,6 +27,11 @@ export const ExtLinks: React.FC<LinkProps> = ({ urls }) => (
         ↗ Sci-Hub
       </a>
     )}
+    {urls.openAccessPdf && (
+      <a className="ext-link oapdf" href={urls.openAccessPdf} target="_blank" rel="noreferrer">
+        ↗ Open Access PDF
+      </a>
+    )}
   </div>
 );
 

@@ -1,5 +1,6 @@
 import https from "https";
 import http from "http";
+import { Readable } from "node:stream";
 
 /**
  * Downloads a URL into a Buffer in memory, following redirects.
@@ -12,7 +13,9 @@ function downloadToBuffer(url: string, maxRedirects = 5): Promise<Buffer> {
       return reject(new Error("Too many redirects"));
     }
 
-    https
+    const client = url.startsWith("http:") ? http : https;
+
+    client
       .get(url, (res) => {
         if (
           res.statusCode !== undefined &&
@@ -80,7 +83,32 @@ function fetchHtml(url: string, maxRedirects = 5): Promise<string> {
   });
 }
 
+/**
+ * Downloads a URL and wraps it as an Express.Multer.File, ready to be
+ * stored via VaultService.addFile.
+ */
+async function downloadAsFile(
+  url: string,
+  fileName: string,
+): Promise<Express.Multer.File> {
+  const buffer = await downloadToBuffer(url);
+
+  return {
+    fieldname: "file",
+    originalname: fileName,
+    encoding: "7bit",
+    mimetype: "application/pdf",
+    buffer,
+    size: buffer.length,
+    stream: Readable.from(buffer),
+    destination: "",
+    filename: fileName,
+    path: "",
+  };
+}
+
 export const DownloadService = {
   downloadToBuffer,
   fetchHtml,
+  downloadAsFile,
 };
