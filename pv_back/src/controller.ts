@@ -109,7 +109,16 @@ const search = async (
 
   const searchQuery = q.trim().toLowerCase();
 
-  const openAlexResults = await OpenAlexClient.searchPapers(searchQuery);
+  let openAlexResults: Paper[] = [];
+  try {
+    openAlexResults = await OpenAlexClient.searchPapers(searchQuery);
+  } catch (error: any) {
+    console.log(
+      "[Controller] Error when searching for papers on OpenAlex:",
+      error,
+    );
+  }
+
   let semanticScholarResults: Paper[] = [];
   try {
     semanticScholarResults =
