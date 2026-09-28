@@ -148,7 +148,8 @@ const getPaperByDoi = async (doi: string): Promise<Paper | undefined> => {
   const response = await axios.get<SemanticScholarWork>(url, {
     headers,
     timeout: 10000,
-    validateStatus: (status) => status === 404 || (status >= 200 && status < 500),
+    validateStatus: (status) =>
+      status === 404 || (status >= 200 && status < 500),
   });
 
   if (response.status === 404) {

@@ -97,7 +97,10 @@ const App: React.FC = () => {
     const onMove = (ev: MouseEvent) => {
       if (!dragRef.current || !mainRef.current) return;
       const delta = dragRef.current.startX - ev.clientX;
-      const next = Math.max(240, Math.min(dragRef.current.startWidth + delta, window.innerWidth * 0.72));
+      const next = Math.max(
+        240,
+        Math.min(dragRef.current.startWidth + delta, window.innerWidth * 0.72)
+      );
       mainRef.current.style.setProperty('--web-col-width', `${next}px`);
       setWebColWidth(next);
     };
@@ -450,42 +453,47 @@ const App: React.FC = () => {
 
           {/* ── Web search column ── */}
           {!readOnly && (
-          <div
-            ref={webColRef}
-            className={`web-column${panelOpen ? ' open' : ''}`}
-            style={{ width: webColWidth }}
-          >
-            <div className="web-col-resize-handle" onMouseDown={handleResizeMouseDown} />
-            <div className="web-col-body">
-              <div className="web-search-bar">
-                <form onSubmit={handleWebSearch} className="web-input-wrap">
-                  <input
-                    type="text"
-                    placeholder="Search for a paper online…"
-                    value={webQuery}
-                    onChange={(e) => setWebQuery(e.target.value)}
-                  />
-                  <button type="submit" disabled={webSearching} className="go-btn">
-                    {webSearching ? 'Searching...' : 'Search'}
-                  </button>
-                </form>
+            <div
+              ref={webColRef}
+              className={`web-column${panelOpen ? ' open' : ''}`}
+              style={{ width: webColWidth }}
+            >
+              <div className="web-col-resize-handle" onMouseDown={handleResizeMouseDown} />
+              <div className="web-col-body">
+                <div className="web-search-bar">
+                  <form onSubmit={handleWebSearch} className="web-input-wrap">
+                    <input
+                      type="text"
+                      placeholder="Search for a paper online…"
+                      value={webQuery}
+                      onChange={(e) => setWebQuery(e.target.value)}
+                    />
+                    <button type="submit" disabled={webSearching} className="go-btn">
+                      {webSearching ? 'Searching...' : 'Search'}
+                    </button>
+                  </form>
+                </div>
+                <WebSearchPanel
+                  results={webResults}
+                  savedIds={savedIds}
+                  onSave={handleSave}
+                  searching={webSearching}
+                  loadingMore={webLoadingMore}
+                  hasMore={webHasMore}
+                  onLoadMore={handleLoadMoreWebResults}
+                />
               </div>
-              <WebSearchPanel
-                results={webResults}
-                savedIds={savedIds}
-                onSave={handleSave}
-                searching={webSearching}
-                loadingMore={webLoadingMore}
-                hasMore={webHasMore}
-                onLoadMore={handleLoadMoreWebResults}
-              />
             </div>
-          </div>
           )}
         </div>
       </div>
 
-      <EditModal open={!!editingPaper} paper={editingPaper} onClose={handleCloseModal} onSave={handleSaveEdit} />
+      <EditModal
+        open={!!editingPaper}
+        paper={editingPaper}
+        onClose={handleCloseModal}
+        onSave={handleSaveEdit}
+      />
       <EditModal
         open={addModalOpen}
         paper={null}
