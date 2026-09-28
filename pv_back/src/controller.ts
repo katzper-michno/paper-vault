@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { Request, Response } from "express";
 import { Paper } from "./types.js";
 import { VaultService } from "./services/vault.js";
@@ -157,6 +158,81 @@ const search = async (
   }
 };
 
+const normalizeDoiInput = (input: string): string => {
+  let doi = input.trim().toLowerCase();
+
+  if (doi.startsWith("https://doi.org/")) {
+    doi = doi.slice("https://doi.org/".length);
+  }
+
+  const arxivId = ArXivClient.extractArxivId(doi);
+  if (arxivId && !doi.startsWith("10.")) {
+    doi = `10.48550/arxiv.${arxivId}`;
+  }
+
+  return doi;
+};
+
+const lookupByDoi = async (
+  req: Request<{}, {}, {}, { doi: string }>,
+  res: Response<Paper | { message: string }>,
+) => {
+  const { doi: rawDoi } = req.query;
+
+  if (!rawDoi) {
+    return res.status(400).json({ message: 'Query parameter "doi" is required' });
+  }
+
+  const doi = normalizeDoiInput(rawDoi);
+
+  let openAlexResult: Paper | undefined;
+  try {
+    openAlexResult = await OpenAlexClient.getPaperByDoi(doi);
+  } catch (error: any) {
+    console.log(
+      "[Controller] Error when looking up paper on OpenAlex:",
+      error,
+    );
+  }
+
+  let semanticScholarResult: Paper | undefined;
+  try {
+    semanticScholarResult = await SemanticScholarClient.getPaperByDoi(doi);
+  } catch (error: any) {
+    console.log(
+      "[Controller] Error when looking up paper on semantic scholar:",
+      error,
+    );
+  }
+
+  const [paper] = mergeEnhanceAndFilterResults(
+    openAlexResult ? [openAlexResult] : [],
+    semanticScholarResult ? [semanticScholarResult] : [],
+  );
+
+  if (!paper) {
+    return res
+      .status(404)
+      .json({ message: `No paper found for DOI "${rawDoi}"` });
+  }
+
+  try {
+    const paperWithLinks: Paper = {
+      ...paper,
+      urls: {
+        ...paper.urls,
+        arxiv: ArXivClient.generateLink(paper),
+        sciHub: await SciHubClient.generateLink(paper),
+      },
+    };
+
+    res.status(200).json(paperWithLinks);
+  } catch (error: any) {
+    console.log("[Controller] Error when resolving urls for paper:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const getPapers = async (
   _: Request,
   res: Response<Paper[] | { message: string }>,
@@ -175,8 +251,14 @@ const addPaper = async (
 ) => {
   const paper = req.body as Paper;
 
-  if (!paper || !paper.id) {
-    return res.status(400).json({ message: "Paper data with id is required" });
+  if (!paper) {
+    return res.status(400).json({ message: "Paper data is required" });
+  }
+
+  if (!paper.id) {
+    paper.id = paper.doi
+      ? VaultService.convertDOIToId(paper.doi)
+      : randomUUID();
   }
 
   if (VaultService.paperExists(paper.id)) {
@@ -367,6 +449,7 @@ const openFile = async (
 export const Controller = {
   healthcheck,
   search,
+  lookupByDoi,
   getPapers,
   addPaper,
   updatePaper,

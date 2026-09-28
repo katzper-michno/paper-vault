@@ -77,4 +77,5 @@ function extractArxivId(input: string): string | null {
 export const ArXivClient = {
   generateLink,
   downloadPdf,
+  extractArxivId,
 };

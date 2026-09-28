@@ -54,6 +54,37 @@ export class SemanticScholarError extends Error {
   }
 }
 
+const SEARCH_FIELDS =
+  "title,authors,year,venue,abstract,externalIds,url,openAccessPdf,journal,publicationTypes";
+
+const mapWork = (work: SemanticScholarWork): Paper => {
+  let doi = work.externalIds?.DOI?.startsWith("https://doi.org/")
+    ? work.externalIds?.DOI?.slice("https://doi.org/".length)
+    : work.externalIds?.DOI;
+
+  if (doi == undefined && Boolean(work.externalIds?.ArXiv)) {
+    doi = "10.48550/arxiv." + work.externalIds!.ArXiv!;
+  }
+
+  doi = doi!.toLowerCase();
+
+  return {
+    id: VaultService.convertDOIToId(doi!),
+    title: work.title,
+    authors: work.authors.map((auth: any) => auth.name),
+    abstract: work.abstract || "",
+    year: work.year,
+    venue: work.journal?.name || work.venue || "",
+    doi: doi!,
+    urls: {
+      semanticScholar: work.url,
+    },
+    volume: work.journal?.volume,
+    pages: work.journal?.pages,
+    publicationType: mapPublicationType(work.publicationTypes),
+  };
+};
+
 const searchPapers = async (query: string): Promise<Paper[]> => {
   const API_KEY = process.env.SEMANTIC_SCHOLAR_API_KEY;
 
@@ -64,7 +95,7 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
     "https://api.semanticscholar.org/graph/v1/paper/search" +
     `?query=${encodeURIComponent(searchTerm)}` +
     "&limit=10" +
-    "&fields=title,authors,year,venue,abstract,externalIds,url,openAccessPdf,journal,publicationTypes";
+    `&fields=${SEARCH_FIELDS}`;
 
   const headers = API_KEY ? { "x-api-key": API_KEY } : {};
 
@@ -95,33 +126,39 @@ const searchPapers = async (query: string): Promise<Paper[]> => {
       (work: SemanticScholarWork) =>
         Boolean(work.externalIds?.DOI) || Boolean(work.externalIds?.ArXiv),
     )
-    .map((work: SemanticScholarWork): Paper => {
-      let doi = work.externalIds?.DOI?.startsWith("https://doi.org/")
-        ? work.externalIds?.DOI?.slice("https://doi.org/".length)
-        : work.externalIds?.DOI;
+    .map(mapWork);
+};
 
-      if (doi == undefined && Boolean(work.externalIds?.ArXiv)) {
-        doi = "10.48550/arxiv." + work.externalIds!.ArXiv!;
-      }
+const getPaperByDoi = async (doi: string): Promise<Paper | undefined> => {
+  const API_KEY = process.env.SEMANTIC_SCHOLAR_API_KEY;
 
-      doi = doi!.toLowerCase();
+  const url =
+    `https://api.semanticscholar.org/graph/v1/paper/DOI:${encodeURIComponent(doi)}` +
+    `?fields=${SEARCH_FIELDS}`;
 
-      return {
-        id: VaultService.convertDOIToId(doi!),
-        title: work.title,
-        authors: work.authors.map((auth: any) => auth.name),
-        abstract: work.abstract || "",
-        year: work.year,
-        venue: work.journal?.name || work.venue || "",
-        doi: doi!,
-        urls: {
-          semanticScholar: work.url,
-        },
-        volume: work.journal?.volume,
-        pages: work.journal?.pages,
-        publicationType: mapPublicationType(work.publicationTypes),
-      };
-    });
+  const headers = API_KEY ? { "x-api-key": API_KEY } : {};
+
+  console.log(`[SemanticScholarClient] Sending request with URL: ${url}`);
+
+  const response = await axios.get<SemanticScholarWork>(url, {
+    headers,
+    timeout: 10000,
+    validateStatus: (status) => status === 404 || (status >= 200 && status < 500),
+  });
+
+  if (response.status === 404) {
+    return undefined;
+  }
+
+  if (response.status !== 200) {
+    throw throwProperError(response);
+  }
+
+  if (!response.data.externalIds?.DOI && !response.data.externalIds?.ArXiv) {
+    return undefined;
+  }
+
+  return mapWork(response.data);
 };
 
 const throwProperError = (response: AxiosResponse) => {
@@ -158,4 +195,5 @@ const throwProperError = (response: AxiosResponse) => {
 
 export const SemanticScholarClient = {
   searchPapers,
+  getPaperByDoi,
 };

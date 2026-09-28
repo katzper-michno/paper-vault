@@ -12,6 +12,9 @@ router.get("/healthcheck", Controller.healthcheck);
 // Search for papers in the web
 router.get("/search", Controller.search);
 
+// Look up a single paper by DOI (or arXiv id/URL)
+router.get("/lookup", Controller.lookupByDoi);
+
 // Typical vault CRUD
 router.get("/papers", Controller.getPapers);
 router.post("/papers", Controller.addPaper);

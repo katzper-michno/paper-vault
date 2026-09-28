@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, FormEvent } from 'react';
 import { Paper, EditFormValues, WebPaper } from './types.ts';
 import { EditModal } from './components/EditModal';
+import { AddPaperModal } from './components/AddPaperModal';
 
 import './App.css';
 import { WebSearchPanel } from './components/WebSearchPanel.tsx';
@@ -72,6 +73,9 @@ const App: React.FC = () => {
   const [editingPaper, setEditingPaper] = useState<Paper | null>(null);
   const editingPromise = useRef<{ promise?: Promise<void>; resolve?: () => void }>({});
 
+  const [addChooserOpen, setAddChooserOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+
   const [libraryQuery, setLibraryQuery] = useState('');
 
   const [savedPapers, setSavedPapers] = useState<Paper[]>([]);
@@ -140,6 +144,32 @@ const App: React.FC = () => {
     } catch (err: any) {
       console.error('Error saving paper:', err);
       toast.error(`Error saving paper: ${err.response?.data.message || err}`);
+    }
+  };
+
+  const handleAddByDoi = async (doi: string): Promise<boolean> => {
+    try {
+      const lookupRes = await axios.get<WebPaper>(`${SERVER_HOST}/lookup`, { params: { doi } });
+      const res = await axios.post<Paper>(`${SERVER_HOST}/papers`, lookupRes.data);
+      setSavedPapers((prev) => [...prev, res.data]);
+      toast.success(`Added "${res.data.title}" to the vault`);
+      return true;
+    } catch (err: any) {
+      console.error('Error adding paper by DOI:', err);
+      toast.error(`Error adding paper: ${err.response?.data.message || err}`);
+      return false;
+    }
+  };
+
+  const handleSaveManual = async (_id: string | null, values: EditFormValues): Promise<void> => {
+    try {
+      const res = await axios.post<Paper>(`${SERVER_HOST}/papers`, values);
+      setSavedPapers((prev) => [...prev, res.data]);
+      setAddModalOpen(false);
+      toast.success(`Added "${res.data.title}" to the vault`);
+    } catch (err: any) {
+      console.error('Error adding paper:', err);
+      toast.error(`Error adding paper: ${err.response?.data.message || err}`);
     }
   };
 
@@ -291,6 +321,7 @@ const App: React.FC = () => {
             webPanelOpen={panelOpen}
             webLoading={loading}
             onWebToggle={() => setPanelOpen((o) => !o)}
+            onAddPaper={() => setAddChooserOpen(true)}
             onDelete={handleRemove}
             onEdit={handleEdit}
             onUpdateNote={handleUpdateNote}
@@ -328,6 +359,18 @@ const App: React.FC = () => {
       </div>
 
       <EditModal open={!!editingPaper} paper={editingPaper} onClose={handleCloseModal} onSave={handleSaveEdit} />
+      <EditModal
+        open={addModalOpen}
+        paper={null}
+        onClose={() => setAddModalOpen(false)}
+        onSave={handleSaveManual}
+      />
+      <AddPaperModal
+        open={addChooserOpen}
+        onClose={() => setAddChooserOpen(false)}
+        onManual={() => setAddModalOpen(true)}
+        onFetchByDoi={handleAddByDoi}
+      />
 
       <ToastContainer
         position="bottom-left"

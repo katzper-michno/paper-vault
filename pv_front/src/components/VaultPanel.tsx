@@ -9,6 +9,7 @@ interface VaultPanelProps {
   webPanelOpen: boolean;
   webLoading: boolean;
   onWebToggle: () => void;
+  onAddPaper: () => void;
   onEdit: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onUpdateNote: (id: string, note: string | undefined) => Promise<void>;
@@ -26,6 +27,7 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
   webPanelOpen,
   webLoading,
   onWebToggle,
+  onAddPaper,
   onEdit,
   onDelete,
   onUpdateNote,
@@ -56,6 +58,9 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
+        <button className="add-paper-btn" onClick={onAddPaper} title="Add a new paper">
+          + Add
+        </button>
         <button
           disabled={webLoading}
           className={`web-toggle-btn${webPanelOpen ? ' active' : ''}`}
