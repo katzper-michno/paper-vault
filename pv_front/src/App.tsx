@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef, FormEvent } from 'react';
-import { Paper, EditFormValues, WebPaper } from './types.ts';
+import { AuthStatus, Paper, EditFormValues, WebPaper } from './types.ts';
 import { EditModal } from './components/EditModal';
 import { AddPaperModal } from './components/AddPaperModal';
+import { ReadOnlyBanner } from './components/ReadOnlyBanner';
 
 import './App.css';
 import { WebSearchPanel } from './components/WebSearchPanel.tsx';
 import { Slide, toast, ToastContainer } from 'react-toastify';
 import axios from 'axios';
 import { VaultPanel } from './components/VaultPanel.tsx';
+
+axios.defaults.withCredentials = true;
 
 const useTheme = () => {
   const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -32,6 +35,49 @@ const App: React.FC = () => {
   const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
+
+  const [authStatus, setAuthStatus] = useState<AuthStatus>({
+    authEnabled: false,
+    readOnly: false,
+    allowNotes: false,
+    allowFiles: false,
+  });
+  const readOnly = authStatus.authEnabled && authStatus.readOnly;
+
+  const refreshAuthStatus = async (): Promise<void> => {
+    try {
+      const res = await axios.get<AuthStatus>(`${SERVER_HOST}/auth/status`);
+      setAuthStatus(res.data);
+    } catch (err: any) {
+      console.error('Error fetching auth status:', err);
+    }
+  };
+
+  useEffect(() => {
+    refreshAuthStatus();
+  }, []);
+
+  const handleUnlock = async (secret: string): Promise<boolean> => {
+    try {
+      await axios.post(`${SERVER_HOST}/auth/unlock`, { secret });
+      window.location.reload();
+      return true;
+    } catch (err: any) {
+      console.error('Error unlocking full access:', err);
+      toast.error(`Error unlocking: ${err.response?.data.message || err}`);
+      return false;
+    }
+  };
+
+  const handleLock = async (): Promise<void> => {
+    try {
+      await axios.post(`${SERVER_HOST}/auth/lock`);
+      window.location.reload();
+    } catch (err: any) {
+      console.error('Error re-locking:', err);
+      toast.error(`Error re-locking: ${err.response?.data.message || err}`);
+    }
+  };
 
   const [panelOpen, setPanelOpen] = useState(false);
   const [webColWidth, setWebColWidth] = useState(defaultWebColWidth);
@@ -306,28 +352,24 @@ const App: React.FC = () => {
     }
   };
 
-  const handleOpenFilesDirectory = async (paperId: string): Promise<void> => {
-    try {
-      await axios.get(`${SERVER_HOST}/papers/${paperId}/files/open`);
-    } catch (err: any) {
-      console.error('Error opening files directory:', err);
-      toast.error(`Error opening files directory: ${err.response?.data.message || err}`);
-    }
-  };
-
   const handleOpenFile = async (paperId: string, fileName: string): Promise<void> => {
-    try {
-      const encodedName = encodeURIComponent(fileName);
-      await axios.get(`${SERVER_HOST}/papers/${paperId}/files/${encodedName}/open`);
-    } catch (err: any) {
-      console.error('Error opening file:', err);
-      toast.error(`Error opening file: ${err.response?.data.message || err}`);
-    }
+    const encodedName = encodeURIComponent(fileName);
+    window.open(
+      `${SERVER_HOST}/papers/${paperId}/files/${encodedName}/open`,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   return (
     <div id="root" className={theme === 'dark' ? 'dark' : ''}>
       <div className="app">
+        <ReadOnlyBanner
+          authEnabled={authStatus.authEnabled}
+          readOnly={readOnly}
+          onUnlock={handleUnlock}
+          onLock={handleLock}
+        />
         <div
           ref={mainRef}
           className={`main${panelOpen ? ' panel-open' : ''}`}
@@ -362,11 +404,12 @@ const App: React.FC = () => {
             onUpdateNote={handleUpdateNote}
             onAddFile={handleAddFile}
             onRemoveFile={handleRemoveFile}
-            onOpenFilesDirectory={handleOpenFilesDirectory}
             onOpenFile={handleOpenFile}
+            readOnly={readOnly}
           />
 
           {/* ── Web search column ── */}
+          {!readOnly && (
           <div
             ref={webColRef}
             className={`web-column${panelOpen ? ' open' : ''}`}
@@ -398,6 +441,7 @@ const App: React.FC = () => {
               />
             </div>
           </div>
+          )}
         </div>
       </div>
 

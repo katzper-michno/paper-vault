@@ -5,9 +5,9 @@ import { SelectedFiles } from 'use-file-picker/types';
 
 interface FilesRowProps {
   paper: Paper;
+  readOnly: boolean;
   onAddFile: (file: File) => Promise<void>;
   onRemoveFile: (name: string) => Promise<void>;
-  onOpenFilesDirectory: () => Promise<void>;
   onOpenFile: (name: string) => Promise<void>;
 }
 
@@ -32,15 +32,14 @@ const getExt = (name: string): string =>
 
 export const FilesRow: React.FC<FilesRowProps> = ({
   paper,
+  readOnly,
   onAddFile,
   onRemoveFile,
   onOpenFile,
-  onOpenFilesDirectory,
 }) => {
   const fileCount = paper.files.length;
 
   const [adding, setAdding] = useState(false);
-  const [openingDir, setOpeningDir] = useState(false);
   const [removing, setRemoving] = useState<string[]>([]);
   const [opening, setOpening] = useState<string[]>([]);
 
@@ -65,12 +64,6 @@ export const FilesRow: React.FC<FilesRowProps> = ({
     setRemoving((prev) => prev.filter((n) => n !== name));
   };
 
-  const handleDirOpen = async () => {
-    setOpeningDir(true);
-    await onOpenFilesDirectory();
-    setTimeout(() => setOpeningDir(false), 1500);
-  };
-
   const handleOpen = async (idx: number) => {
     const name = paper.files[idx];
     setOpening((prev) => [...prev, name]);
@@ -78,24 +71,26 @@ export const FilesRow: React.FC<FilesRowProps> = ({
     setTimeout(() => setOpening((prev) => prev.filter((n) => n !== name)), 1500);
   };
 
+  if (fileCount === 0 && readOnly) return null;
+
   return (
     <div className="files-section">
-      {fileCount > 0 && (
-        <div className="files-mosaic">
-          {paper.files.map((f, i) => {
-            const busy = opening.includes(f) || removing.includes(f);
-            const color = getExtColor(f);
-            return (
-              <div
-                key={i}
-                className={`file-tile${busy ? ' busy' : ''}`}
-                onClick={() => !busy && handleOpen(i)}
-                title={f}
-              >
-                <span className="file-tile-ext" style={{ background: color }}>
-                  {getExt(f)}
-                </span>
-                <span className="file-tile-name">{f}</span>
+      <div className="files-mosaic">
+        {paper.files.map((f, i) => {
+          const busy = opening.includes(f) || removing.includes(f);
+          const color = getExtColor(f);
+          return (
+            <div
+              key={i}
+              className={`file-tile${busy ? ' busy' : ''}`}
+              onClick={() => !busy && handleOpen(i)}
+              title={f}
+            >
+              <span className="file-tile-ext" style={{ background: color }}>
+                {getExt(f)}
+              </span>
+              <span className="file-tile-name">{f}</span>
+              {!readOnly && (
                 <button
                   className="file-tile-del"
                   onClick={(e) => { e.stopPropagation(); handleRemove(i); }}
@@ -104,23 +99,20 @@ export const FilesRow: React.FC<FilesRowProps> = ({
                 >
                   ×
                 </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              )}
+            </div>
+          );
+        })}
 
-      <div className="files-actions">
-        <button
-          disabled={adding || loadingFile}
-          onClick={openFilePicker}
-          className="act-btn"
-        >
-          {adding || loadingFile ? 'Adding…' : '+ Attach'}
-        </button>
-        <button disabled={openingDir} onClick={handleDirOpen} className="act-btn">
-          {openingDir ? 'Opening…' : '> Open dir'}
-        </button>
+        {!readOnly && (
+          <button
+            disabled={adding || loadingFile}
+            onClick={openFilePicker}
+            className="file-attach-btn"
+          >
+            {adding || loadingFile ? 'Adding…' : '+ Attach'}
+          </button>
+        )}
       </div>
     </div>
   );

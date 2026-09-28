@@ -123,6 +123,84 @@
   background: var(--bg1);
 }
 
+/* ── Read-only banner ── */
+.readonly-banner {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  font-size: 12px;
+  background: var(--yellow-bg);
+  border-bottom: 0.5px solid var(--yellow-bd);
+  color: var(--yellow-tx);
+}
+
+.readonly-banner.unlocked {
+  background: var(--saved-bg);
+  border-bottom-color: var(--saved-bd);
+  color: var(--saved-tx);
+}
+
+.readonly-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.readonly-unlock-form {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.readonly-unlock-form input {
+  padding: 5px 9px;
+  font-size: 12px;
+  border: 0.5px solid var(--yellow-bd);
+  border-radius: 7px;
+  background: var(--bg0);
+  color: var(--text0);
+  outline: none;
+  width: 140px;
+}
+
+.readonly-unlock-form input:focus {
+  border-color: var(--border2);
+}
+
+.readonly-unlock-form button,
+.readonly-lock-btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 7px;
+  border: 0.5px solid var(--yellow-bd);
+  background: var(--bg0);
+  color: var(--yellow-tx);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.readonly-unlock-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.readonly-unlock-form button:hover:not(:disabled) {
+  background: var(--yellow-bg);
+}
+
+.readonly-lock-btn {
+  border-color: var(--saved-bd);
+  color: var(--saved-tx);
+}
+
+.readonly-lock-btn:hover {
+  background: var(--saved-bg);
+}
+
 /* ── Highlighted text ── */
 .highlighted-text {
   background-color: var(--saved-bg);
@@ -599,30 +677,44 @@
   margin-top: 8px;
   border-top: 0.5px solid var(--border0);
   padding-top: 7px;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.files-actions {
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
-  flex-shrink: 0;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.paper-card:hover .files-actions {
-  opacity: 1;
 }
 
 .files-mosaic {
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
+}
+
+.file-attach-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 0.5px dashed var(--border1);
+  background: transparent;
+  color: var(--text1);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: all 0.15s;
+}
+
+.paper-card:hover .file-attach-btn {
+  opacity: 1;
+}
+
+.file-attach-btn:hover:not(:disabled) {
+  border-style: solid;
+  border-color: var(--save-h-bd);
+  color: var(--save-h-tx);
+  background: var(--save-h-bg);
+}
+
+.file-attach-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .file-tile {

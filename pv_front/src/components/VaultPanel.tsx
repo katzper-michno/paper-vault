@@ -15,8 +15,8 @@ interface VaultPanelProps {
   onUpdateNote: (id: string, note: string | undefined) => Promise<void>;
   onAddFile: (paperId: string, file: File) => Promise<void>;
   onRemoveFile: (paperId: string, name: string) => Promise<void>;
-  onOpenFilesDirectory: (paperId: string) => Promise<void>;
   onOpenFile: (paperId: string, name: string) => Promise<void>;
+  readOnly: boolean;
 }
 
 export const VaultPanel: React.FC<VaultPanelProps> = ({
@@ -34,7 +34,7 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
   onAddFile,
   onRemoveFile,
   onOpenFile,
-  onOpenFilesDirectory,
+  readOnly,
 }) => {
   const filteredSavedPapers: Paper[] = savedPapers
     ? savedPapers.filter(
@@ -58,23 +58,27 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <button className="add-paper-btn" onClick={onAddPaper} title="Add a new paper">
-          + Add
-        </button>
-        <button
-          disabled={webLoading}
-          className={`web-toggle-btn${webPanelOpen ? ' active' : ''}`}
-          onClick={onWebToggle}
-        >
-          <span className="dot" />
-          <span>Web search</span>
-          <span
-            className="toggle-arrow"
-            style={{ transform: webPanelOpen ? 'rotate(180deg)' : '' }}
+        {!readOnly && (
+          <button className="add-paper-btn" onClick={onAddPaper} title="Add a new paper">
+            + Add
+          </button>
+        )}
+        {!readOnly && (
+          <button
+            disabled={webLoading}
+            className={`web-toggle-btn${webPanelOpen ? ' active' : ''}`}
+            onClick={onWebToggle}
           >
-            ›
-          </span>
-        </button>
+            <span className="dot" />
+            <span>Web search</span>
+            <span
+              className="toggle-arrow"
+              style={{ transform: webPanelOpen ? 'rotate(180deg)' : '' }}
+            >
+              ›
+            </span>
+          </button>
+        )}
       </div>
       <div className="db-list">
         {filteredSavedPapers.reverse().map((p) => (
@@ -88,7 +92,7 @@ export const VaultPanel: React.FC<VaultPanelProps> = ({
             onAddFile={onAddFile}
             onRemoveFile={onRemoveFile}
             onOpenFile={onOpenFile}
-            onOpenFilesDirectory={onOpenFilesDirectory}
+            readOnly={readOnly}
           />
         ))}
         {filteredSavedPapers.length === 0 && (

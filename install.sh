@@ -71,7 +71,10 @@ create_config() {
   "FRONTEND_PORT": "5173",
   "OPEN_ALEX_API_KEY": "",
   "SEMANTIC_SCHOLAR_API_KEY": "",
-  "VAULT_PATH": "${repo_path}/vault_example"
+  "VAULT_PATH": "${repo_path}/vault_example",
+  "READONLY_SECRET": "",
+  "READONLY_ALLOW_NOTES": "false",
+  "READONLY_ALLOW_FILES": "false"
 }
 EOF
     

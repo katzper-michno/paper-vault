@@ -7,6 +7,7 @@ import { ArXivClient } from "./services/arxiv.js";
 import { SciHubClient } from "./services/sciHub.js";
 import { OpenAlexClient } from "./services/openAlex.js";
 import { SemanticScholarClient } from "./services/semanticScholar.js";
+import { AuthService } from "./services/auth.js";
 
 const healthcheck = async (_: Request, res: Response) => {
   res.status(200).json({ message: "PaperVault service is OK:)" });
@@ -244,12 +245,24 @@ const lookupByDoi = async (
   }
 };
 
+const sanitizeForReadOnly = (paper: Paper): Paper => {
+  const sanitized = { ...paper };
+  if (!AuthService.allowNotesInReadOnly()) delete sanitized.note;
+  if (!AuthService.allowFilesInReadOnly()) sanitized.files = [];
+  return sanitized;
+};
+
 const getPapers = async (
-  _: Request,
+  req: Request,
   res: Response<Paper[] | { message: string }>,
 ) => {
   try {
-    res.status(200).json(VaultService.getPapers());
+    const papers = VaultService.getPapers();
+    const visiblePapers = AuthService.isAuthenticated(req)
+      ? papers
+      : papers.map(sanitizeForReadOnly);
+
+    res.status(200).json(visiblePapers);
   } catch (error: any) {
     console.log("[Controller] Error when obtaining saved papers:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -414,30 +427,9 @@ const deleteFile = async (
   }
 };
 
-const openFilesDir = async (
-  req: Request<{ id: string }>,
-  res: Response<{ message: string }>,
-) => {
-  const { id } = req.params;
-
-  if (!VaultService.paperExists(id)) {
-    return res.status(404).json({ message: `Paper with id ${id} not found` });
-  }
-
-  try {
-    VaultService.openFilesDir(id);
-    res.status(200).json({
-      message: `Directory of files attached to ${id} opened successfuly`,
-    });
-  } catch (error: any) {
-    console.log("[Controller] Error when opening files directory:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
 const openFile = async (
   req: Request<{ id: string; name: string }>,
-  res: Response<{ message: string }>,
+  res: Response,
 ) => {
   const { id, name } = req.params;
   const decodedName = decodeURIComponent(name);
@@ -446,14 +438,18 @@ const openFile = async (
     return res.status(404).json({ message: `Paper with id ${id} not found` });
   }
 
-  try {
-    VaultService.openFile(id, decodedName);
-    res.status(200).json({
-      message: `File ${name} attached to paper ${id} opened successfuly`,
+  if (!AuthService.isAuthenticated(req) && !AuthService.allowFilesInReadOnly()) {
+    return res.status(401).json({
+      message: "This vault is read-only. Unlock full access to view attached files.",
     });
+  }
+
+  try {
+    const filePath = VaultService.getFilePath(id, decodedName);
+    res.sendFile(filePath);
   } catch (error: any) {
     console.log("[Controller] Error when opening file:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(404).json({ message: `File ${name} not found` });
   }
 };
 
@@ -468,6 +464,5 @@ export const Controller = {
   generateBibTeX,
   addFile,
   deleteFile,
-  openFilesDir,
   openFile,
 };

@@ -16,8 +16,8 @@ interface PaperCardProps {
   onUpdateNote: (id: string, note: string | undefined) => Promise<void>;
   onAddFile: (paperId: string, file: File) => Promise<void>;
   onRemoveFile: (paperId: string, name: string) => Promise<void>;
-  onOpenFilesDirectory: (paperId: string) => Promise<void>;
   onOpenFile: (paperId: string, name: string) => Promise<void>;
+  readOnly: boolean;
 }
 
 export const PaperCard: React.FC<PaperCardProps> = ({
@@ -29,7 +29,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   onAddFile,
   onRemoveFile,
   onOpenFile,
-  onOpenFilesDirectory,
+  readOnly,
 }) => {
   const SERVER_HOST = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -53,7 +53,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   const dragCounter = useRef(0);
 
   const handleDragEnter = (e: React.DragEvent) => {
-    if (!e.dataTransfer.types.includes('Files')) return;
+    if (readOnly || !e.dataTransfer.types.includes('Files')) return;
     dragCounter.current++;
     setDragOver(true);
   };
@@ -64,7 +64,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   };
 
   const handleDragOver = (e: React.DragEvent) => {
-    if (!e.dataTransfer.types.includes('Files')) return;
+    if (readOnly || !e.dataTransfer.types.includes('Files')) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
   };
@@ -73,6 +73,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
     e.preventDefault();
     dragCounter.current = 0;
     setDragOver(false);
+    if (readOnly) return;
     const files = Array.from(e.dataTransfer.files);
     for (const file of files) {
       await onAddFile(paper.id, file);
@@ -183,12 +184,16 @@ export const PaperCard: React.FC<PaperCardProps> = ({
           <button disabled={copiedBibtex} onClick={handleCopyBibtex} className="act-btn bibtex">
             {copiedBibtex ? '✓ Copied' : 'Copy BibTeX'}
           </button>
-          <button className="act-btn" onClick={handleEdit}>
-            {isEdited ? 'Editing...' : 'Edit'}
-          </button>
-          <button disabled={modifyLock} className="act-btn del" onClick={handleDelete}>
-            {isDeleted ? 'Removing...' : 'Remove'}
-          </button>
+          {!readOnly && (
+            <button className="act-btn" onClick={handleEdit}>
+              {isEdited ? 'Editing...' : 'Edit'}
+            </button>
+          )}
+          {!readOnly && (
+            <button disabled={modifyLock} className="act-btn del" onClick={handleDelete}>
+              {isDeleted ? 'Removing...' : 'Remove'}
+            </button>
+          )}
         </div>
       </div>
 
@@ -203,7 +208,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       {/* ── Ext links + "Add note" button ── */}
       <div className="links-row">
         <ExtLinks urls={paper.urls} />
-        {!editingNote && !paper.note && (
+        {!readOnly && !editingNote && !paper.note && (
           <button className="add-note-btn" onClick={handleStartEditNote}>
             + Add note
           </button>
@@ -224,14 +229,16 @@ export const PaperCard: React.FC<PaperCardProps> = ({
               </span>
             )}
           </div>
-          <div className="note-box-actions">
-            <button className="note-act-btn" onClick={handleStartEditNote} title="Edit note">
-              ✎
-            </button>
-            <button className="note-act-btn del" onClick={handleRemoveNote} title="Remove note">
-              ×
-            </button>
-          </div>
+          {!readOnly && (
+            <div className="note-box-actions">
+              <button className="note-act-btn" onClick={handleStartEditNote} title="Edit note">
+                ✎
+              </button>
+              <button className="note-act-btn del" onClick={handleRemoveNote} title="Remove note">
+                ×
+              </button>
+            </div>
+          )}
         </div>
       )}
       {editingNote && (
@@ -259,9 +266,9 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       {/* ── Files ── */}
       <FilesRow
         paper={paper}
+        readOnly={readOnly}
         onAddFile={(file: File) => onAddFile(paper.id, file)}
         onRemoveFile={(name: string) => onRemoveFile(paper.id, name)}
-        onOpenFilesDirectory={() => onOpenFilesDirectory(paper.id)}
         onOpenFile={(name: string) => onOpenFile(paper.id, name)}
       />
 

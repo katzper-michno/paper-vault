@@ -30,3 +30,10 @@ export interface WebPaper extends EditFormValues {
 export interface Paper extends WebPaper {
   files: string[];
 }
+
+export interface AuthStatus {
+  authEnabled: boolean;
+  readOnly: boolean;
+  allowNotes: boolean;
+  allowFiles: boolean;
+}

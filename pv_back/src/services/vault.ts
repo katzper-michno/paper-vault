@@ -8,7 +8,6 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
-import open from "open";
 
 const vaultPath = (): string => {
   const p = process.env.VAULT_PATH;
@@ -90,24 +89,34 @@ const deletePaper = (id: string) => {
   rmSync(path.join(vaultFilesPath(), id), { recursive: true });
 };
 
+// Resolves a file name against a paper's files directory, rejecting any
+// name that would escape it (e.g. via "../"), since it comes from client input.
+const resolveFilePath = (id: string, fileName: string): string => {
+  const dir = path.resolve(vaultFilesPath(), id);
+  const resolved = path.resolve(dir, fileName);
+  if (resolved !== dir && !resolved.startsWith(dir + path.sep)) {
+    throw new Error(`Invalid file name: ${fileName}`);
+  }
+  return resolved;
+};
+
 const addFile = (id: string, file: Express.Multer.File): string => {
-  const dest = path.join(vaultFilesPath(), id, file.originalname);
+  const dest = resolveFilePath(id, file.originalname);
   mkdirSync(path.dirname(dest), { recursive: true });
   writeFileSync(dest, file.buffer);
   return file.originalname;
 };
 
 const deleteFile = (id: string, fileName: string) =>
-  rmSync(path.join(vaultFilesPath(), id, fileName));
+  rmSync(resolveFilePath(id, fileName));
 
-const openFilesDir = (id: string) => {
-  const filesPath = path.join(vaultFilesPath(), id);
-  mkdirSync(filesPath, { recursive: true });
-  open(filesPath);
+const getFilePath = (id: string, fileName: string): string => {
+  const filePath = resolveFilePath(id, fileName);
+  if (!existsSync(filePath)) {
+    throw new Error(`File ${fileName} not found for paper ${id}`);
+  }
+  return filePath;
 };
-
-const openFile = (id: string, fileName: string) =>
-  open(path.join(vaultFilesPath(), id, fileName));
 
 export const VaultService = {
   convertDOIToId,
@@ -121,6 +130,5 @@ export const VaultService = {
   deletePaper,
   addFile,
   deleteFile,
-  openFilesDir,
-  openFile,
+  getFilePath,
 };
