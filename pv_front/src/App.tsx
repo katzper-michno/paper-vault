@@ -154,24 +154,11 @@ const App: React.FC = () => {
     return editingPromise.current.promise;
   };
 
-  const handleSaveEdit = async (id: string, values: EditFormValues): Promise<void> => {
-    let paper: Paper = savedPapers.find((p: Paper) => p.id === id)!;
+  const handleSaveEdit = async (id: string | null, values: EditFormValues): Promise<void> => {
+    if (!id) return;
 
-    paper = {
-      ...paper,
-      title: values.title,
-      authors: values.authors,
-      venue: values.venue,
-      year: values.year,
-      doi: values.doi,
-      urls: {
-        openAlex: values.urls.openAlex,
-        arxiv: values.urls.arxiv,
-        sciHub: values.urls.sciHub,
-      },
-      abstract: values.abstract,
-      note: values.note,
-    };
+    const existing: Paper = savedPapers.find((p: Paper) => p.id === id)!;
+    const paper: Paper = { ...existing, ...values };
 
     try {
       await axios.put(`${SERVER_HOST}/papers/${id}`, paper);
@@ -284,25 +271,14 @@ const App: React.FC = () => {
           {/* ── Sidebar ── */}
           <div className="sidebar">
             <button
-              className="icon-btn"
-              onClick={() =>
-                window.alert(
-                  'Here, you will be able to manage your vault repository (push, pull, commit).'
-                )
-              }
+              className={`theme-toggle${theme === 'dark' ? ' dark' : ''}`}
+              onClick={toggleTheme}
+              title="Toggle light/dark mode"
+              aria-label="Toggle light/dark mode"
+              role="switch"
+              aria-checked={theme === 'dark'}
             >
-              ⎇
-            </button>
-            <button
-              className="icon-btn"
-              onClick={() =>
-                window.alert('Here, you will be able to modify environment variables.')
-              }
-            >
-              ⚙︎
-            </button>
-            <button className="icon-btn" onClick={toggleTheme} title="Toggle light/dark mode">
-              {theme === 'dark' ? '☽' : '☀'}
+              <span className="theme-toggle-thumb">{theme === 'dark' ? '☽' : '☀'}</span>
             </button>
           </div>
 
@@ -351,7 +327,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <EditModal paper={editingPaper} onClose={handleCloseModal} onSave={handleSaveEdit} />
+      <EditModal open={!!editingPaper} paper={editingPaper} onClose={handleCloseModal} onSave={handleSaveEdit} />
 
       <ToastContainer
         position="bottom-left"

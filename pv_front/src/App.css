@@ -234,26 +234,54 @@
 
 
 /* Theme toggle */
-.icon-btn {
-  width: 32px;
+.theme-toggle {
+  width: 18px;
   height: 32px;
-  border-radius: 8px;
+  padding: 0;
+  margin-top: auto;
+  border-radius: 999px;
   border: 0.5px solid var(--border1);
   background: var(--bg1);
-  color: var(--text1);
   cursor: pointer;
-  font-size: 14px;
+  position: relative;
+  flex-shrink: 0;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.theme-toggle:hover {
+  border-color: var(--border2);
+}
+
+.theme-toggle.dark {
+  background: var(--blue-bg);
+  border-color: var(--blue-bd);
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg0);
+  color: var(--text1);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
-  flex-shrink: 0;
+  font-size: 9px;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition:
+    transform 0.2s ease,
+    color 0.2s;
 }
 
-.icon-btn:hover {
-  border-color: var(--border2);
-  color: var(--text0);
-  background: var(--bg2);
+.theme-toggle.dark .theme-toggle-thumb {
+  transform: translateY(14px);
+  color: var(--blue-tx);
 }
 
 
@@ -839,8 +867,11 @@
   border: 0.5px solid var(--border1);
   border-radius: 12px;
   padding: 18px;
-  width: 440px;
+  width: 480px;
   max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-title {
@@ -848,6 +879,27 @@
   font-weight: 500;
   margin-bottom: 13px;
   color: var(--text0);
+  flex-shrink: 0;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.modal-body {
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 6px;
+  margin-right: -6px;
+}
+
+.authors-list {
+  max-height: 160px;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 10px;
 }
 
 .mfield {
@@ -861,7 +913,8 @@
 }
 
 .mfield input,
-.mfield textarea {
+.mfield textarea,
+.mfield select {
   width: 100%;
   padding: 6px 10px;
   font-size: 13px;
@@ -882,7 +935,8 @@
 }
 
 .mfield input:focus,
-.mfield textarea:focus {
+.mfield textarea:focus,
+.mfield select:focus {
   border-color: var(--border2);
 }
 
