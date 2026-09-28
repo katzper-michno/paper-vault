@@ -85,12 +85,13 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   const isNoteCollapsible = noteText.length > NOTE_CHAR_LIMIT;
 
   const noteMatchInText =
-    isNoteCollapsible && !!filterQuery && noteText.toLowerCase().includes(filterQuery.toLowerCase());
+    isNoteCollapsible &&
+    !!filterQuery &&
+    noteText.toLowerCase().includes(filterQuery.toLowerCase());
 
   const isNoteExpanded = noteUserExpanded || noteMatchInText;
-  const displayedNote = !isNoteCollapsible || isNoteExpanded
-    ? noteText
-    : trimToLimit(noteText, NOTE_CHAR_LIMIT);
+  const displayedNote =
+    !isNoteCollapsible || isNoteExpanded ? noteText : trimToLimit(noteText, NOTE_CHAR_LIMIT);
 
   // ── Handlers ────────────────────────────────────────────────────────────
   const handleEdit = async () => {
@@ -199,7 +200,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
       {/* ── Tags ── */}
       <div className="paper-meta">
-        <span className="tag venue">{paper.venue || "N/A"}</span>
+        <span className="tag venue">{paper.venue || 'N/A'}</span>
         <span className="tag">{paper.year}</span>
       </div>
 
@@ -221,10 +222,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
           <div className="note-text">
             <HighlightedText text={displayedNote} query={filterQuery} />
             {isNoteCollapsible && !noteMatchInText && (
-              <span
-                className="note-expand"
-                onClick={() => setNoteUserExpanded((p) => !p)}
-              >
+              <span className="note-expand" onClick={() => setNoteUserExpanded((p) => !p)}>
                 {isNoteExpanded ? ' △ Less' : ' ▽ More'}
               </span>
             )}

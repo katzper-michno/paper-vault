@@ -205,7 +205,9 @@ export const EditModal: React.FC<EditModalProps> = ({ open, paper, onClose, onSa
                 <div className="mlabel">Publication type</div>
                 <select
                   value={draft.publicationType}
-                  onChange={(e) => set('publicationType', e.target.value as Draft['publicationType'])}
+                  onChange={(e) =>
+                    set('publicationType', e.target.value as Draft['publicationType'])
+                  }
                 >
                   <option value="">Unspecified</option>
                   <option value="article">Article</option>

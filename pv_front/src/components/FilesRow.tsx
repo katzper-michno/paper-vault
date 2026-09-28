@@ -13,13 +13,30 @@ interface FilesRowProps {
 
 const EXT_COLORS: Record<string, string> = {
   pdf: '#d94040',
-  png: '#38a05c', jpg: '#38a05c', jpeg: '#38a05c', gif: '#38a05c',
-  svg: '#38a05c', webp: '#38a05c', heic: '#38a05c',
-  doc: '#2b6cbf', docx: '#2b6cbf', txt: '#6080a0', md: '#6080a0',
-  xls: '#1f8a4c', xlsx: '#1f8a4c', csv: '#1f8a4c',
-  ppt: '#c94f0d', pptx: '#c94f0d',
-  zip: '#7b4fbf', tar: '#7b4fbf', gz: '#7b4fbf', rar: '#7b4fbf',
-  py: '#3572a5', js: '#c8a000', ts: '#2b6cbf', rs: '#c94f0d',
+  png: '#38a05c',
+  jpg: '#38a05c',
+  jpeg: '#38a05c',
+  gif: '#38a05c',
+  svg: '#38a05c',
+  webp: '#38a05c',
+  heic: '#38a05c',
+  doc: '#2b6cbf',
+  docx: '#2b6cbf',
+  txt: '#6080a0',
+  md: '#6080a0',
+  xls: '#1f8a4c',
+  xlsx: '#1f8a4c',
+  csv: '#1f8a4c',
+  ppt: '#c94f0d',
+  pptx: '#c94f0d',
+  zip: '#7b4fbf',
+  tar: '#7b4fbf',
+  gz: '#7b4fbf',
+  rar: '#7b4fbf',
+  py: '#3572a5',
+  js: '#c8a000',
+  ts: '#2b6cbf',
+  rs: '#c94f0d',
 };
 
 const getExtColor = (name: string): string => {
@@ -93,7 +110,10 @@ export const FilesRow: React.FC<FilesRowProps> = ({
               {!readOnly && (
                 <button
                   className="file-tile-del"
-                  onClick={(e) => { e.stopPropagation(); handleRemove(i); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemove(i);
+                  }}
                   disabled={busy}
                   title="Remove file"
                 >

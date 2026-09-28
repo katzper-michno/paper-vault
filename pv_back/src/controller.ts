@@ -142,7 +142,8 @@ const search = async (
     );
   }
 
-  const hasMore = openAlexResults.length > 0 || semanticScholarResults.length > 0;
+  const hasMore =
+    openAlexResults.length > 0 || semanticScholarResults.length > 0;
 
   const searchResults = mergeEnhanceAndFilterResults(
     openAlexResults,
@@ -193,7 +194,9 @@ const lookupByDoi = async (
   const { doi: rawDoi } = req.query;
 
   if (!rawDoi) {
-    return res.status(400).json({ message: 'Query parameter "doi" is required' });
+    return res
+      .status(400)
+      .json({ message: 'Query parameter "doi" is required' });
   }
 
   const doi = normalizeDoiInput(rawDoi);
@@ -202,10 +205,7 @@ const lookupByDoi = async (
   try {
     openAlexResult = await OpenAlexClient.getPaperByDoi(doi);
   } catch (error: any) {
-    console.log(
-      "[Controller] Error when looking up paper on OpenAlex:",
-      error,
-    );
+    console.log("[Controller] Error when looking up paper on OpenAlex:", error);
   }
 
   let semanticScholarResult: Paper | undefined;
@@ -384,7 +384,9 @@ const undoDelete = async (
       return res.status(404).json({ message: error.message });
     }
     console.log("[Controller] Error when restoring last deleted paper:", error);
-    res.status(409).json({ message: error.message || "Could not restore paper" });
+    res
+      .status(409)
+      .json({ message: error.message || "Could not restore paper" });
   }
 };
 
@@ -468,9 +470,13 @@ const openFile = async (
     return res.status(404).json({ message: `Paper with id ${id} not found` });
   }
 
-  if (!AuthService.isAuthenticated(req) && !AuthService.allowFilesInReadOnly()) {
+  if (
+    !AuthService.isAuthenticated(req) &&
+    !AuthService.allowFilesInReadOnly()
+  ) {
     return res.status(401).json({
-      message: "This vault is read-only. Unlock full access to view attached files.",
+      message:
+        "This vault is read-only. Unlock full access to view attached files.",
     });
   }
 

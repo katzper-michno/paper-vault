@@ -127,7 +127,8 @@ export async function getPaperByDoi(doi: string): Promise<Paper | undefined> {
 
   const response = await axios.get<OpenAlexWork>(url, {
     timeout: 20000,
-    validateStatus: (status) => status === 404 || (status >= 200 && status < 300),
+    validateStatus: (status) =>
+      status === 404 || (status >= 200 && status < 300),
   });
 
   if (response.status === 404 || !response.data.doi) {

@@ -330,7 +330,6 @@
   background: var(--bg2);
 }
 
-
 /* Theme toggle */
 .theme-toggle {
   width: 18px;
@@ -381,7 +380,6 @@
   transform: translateY(14px);
   color: var(--blue-tx);
 }
-
 
 .dot {
   width: 6px;
@@ -436,7 +434,6 @@
 .db-list::-webkit-scrollbar {
   display: none;
 }
-
 
 .empty-state {
   font-size: 13px;
@@ -736,7 +733,9 @@
   background: var(--bg1);
   cursor: pointer;
   padding: 3px 22px 3px 6px;
-  transition: border-color 0.12s, opacity 0.15s;
+  transition:
+    border-color 0.12s,
+    opacity 0.15s;
   overflow: hidden;
 }
 
@@ -787,7 +786,9 @@
   justify-content: center;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.12s, background 0.1s;
+  transition:
+    opacity 0.12s,
+    background 0.1s;
   padding: 0;
   line-height: 1;
 }
@@ -854,7 +855,6 @@
   flex-direction: column;
   overflow: hidden;
 }
-
 
 .web-input-wrap {
   position: relative;
